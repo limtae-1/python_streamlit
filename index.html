@@ -4,39 +4,158 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>파이썬 출력 명령어 수업</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.31.0/build/stlite.css" />
+    <title>경문고 정보수업 - Python 실습</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.31.0/build/stlite.css">
   </head>
   <body>
     <div id="root"></div>
+    
     <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.31.0/build/stlite.js"></script>
     <script>
       stlite.mount({
-        requirements: [], // 추가 라이브러리가 필요하면 여기에 작성 (예: pandas)
-        entrypoint: "app.py",
+        requirements: [], // 필요한 패키지가 있다면 여기에 추가 (예: ["pandas"])
+        entrypoint: "streamlit_app.py",
         files: {
-          "app.py": `
+          "streamlit_app.py": `
 import streamlit as st
+import sys
+from io import StringIO
+import random
 
-st.markdown("### :orange[출력명령어를 알아보자!]")
+# ==========================================
+# [여기부터 위에서 작성한 app.py 코드를 복사해서 붙여넣으세요]
+# ==========================================
+st.set_page_config(layout="wide", page_title="경문고 정보수업 Python 박살내기")
 
-st.subheader("출력명령어 print()")
 st.markdown("""
-* Python 언어에서 화면에 출력을 하는 명령어는 **print()** 명령어이다.
-* **문자를 출력**하기 위해선 (큰, 작은) 따옴표로 감싸주어야 한다.
-""")
+<style>
+    .stTextArea textarea {
+        font-family: 'Courier New', monospace !important;
+        font-size: 16px !important;
+        line-height: 24px !important;
+        background-image: linear-gradient(transparent 50%, rgba(200, 200, 200, 0.1) 50%);
+        background-size: 100% 48px;
+        background-attachment: local;
+        border: 1px solid #ddd;
+    }
+    .output-box {
+        background-color: #f0f2f6;
+        padding: 10px;
+        border-radius: 5px;
+        border-left: 5px solid #ff4b4b;
+        font-family: monospace;
+        white-space: pre-wrap;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# 실습 섹션
-user_input = st.text_input("연습: 'kyungmoon'을 출력해보세요", placeholder="print('...')")
+st.sidebar.title("🐍 Python 박살내기")
+st.sidebar.info("정보 수업 실습 페이지입니다.")
 
-if user_input:
-    if "kyungmoon" in user_input:
-        st.success("참 잘했어요! 🎉")
-    else:
-        st.error("다시 한번 확인해볼까요?")
-          `,
-        },
-      }, document.getElementById("root"));
+topic = st.sidebar.selectbox(
+    "학습할 주제를 선택하세요:",
+    [
+        "1. 프로그래밍과 출력",
+        "2. 입력 명령어",
+        "3. 변수와 주석",
+        "4. 자료형 (Data Type)",
+        "5. 연산자 (Operator)",
+        "6. 조건문 (if)",
+        "7. 반복문 (for, while)",
+        "8. 리스트 (List)",
+        "9. 함수 (Function)",
+        "10. 모듈 (Module)"
+    ]
+)
+
+def run_code_block(default_code, key_suffix):
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        st.subheader("💻 코드 작성")
+        code_input = st.text_area("코드 입력 (Line 번호 대용 음영 처리)", value=default_code, height=300, key=f"editor_{key_suffix}")
+        
+        if st.button(f"▶ 실행하기", key=f"btn_{key_suffix}"):
+            with col2:
+                st.subheader("결과 확인")
+                old_stdout = sys.stdout
+                redirected_output = sys.stdout = StringIO()
+                try:
+                    exec(code_input, globals())
+                    output = redirected_output.getvalue()
+                    if output:
+                        st.markdown(f'<div class="output-box">{output}</div>', unsafe_allow_html=True)
+                    else:
+                        st.info("실행 완료 (출력값 없음)")
+                except Exception as e:
+                    st.error(f"에러 발생:\\n{e}")
+                finally:
+                    sys.stdout = old_stdout
+        else:
+            with col2:
+                st.subheader("결과 확인")
+                st.write("👈 왼쪽에서 '실행하기' 버튼을 눌러보세요.")
+
+# --- 본문 내용 ---
+
+if topic == "1. 프로그래밍과 출력":
+    st.header("1. 프로그래밍과 출력명령어 print()")
+    st.markdown("""
+    * **프로그램**: 컴퓨터가 무엇을 해야 할지 미리 작성한 진행 계획[cite: 11].
+    * **Python**: 1991년 귀도 반 로섬이 만든 언어[cite: 44].
+    """)
+    run_code_block('print("Hello World")\\nprint(94)', "print")
+
+elif topic == "2. 입력 명령어":
+    st.header("2. 입력 명령어 input()")
+    st.markdown("사용자가 자료를 입력할 수 있도록 하는 명령어[cite: 74].")
+    run_code_block('n = input("입력: ")\\nprint(n)', "input")
+
+elif topic == "3. 변수와 주석":
+    st.header("3. 변수와 주석")
+    st.markdown("변수는 자료를 저장하는 공간 [cite: 128], 주석은 메모[cite: 98].")
+    run_code_block('n = 10\\nprint(n)\\n# 이것은 주석입니다', "var")
+
+elif topic == "4. 자료형 (Data Type)":
+    st.header("4. 자료형")
+    st.markdown("정수(int), 실수(float), 문자열(str), 불린(bool)[cite: 168, 175, 177, 185].")
+    run_code_block('a = 10\\nb = 10.5\\ns = "Hi"\\nprint(type(a), type(b), type(s))', "type")
+
+elif topic == "5. 연산자 (Operator)":
+    st.header("5. 연산자")
+    st.markdown("산술, 비교, 논리 연산자[cite: 213].")
+    run_code_block('print(10 + 3)\\nprint(10 // 3)\\nprint(10 > 3)', "op")
+
+elif topic == "6. 조건문 (if)":
+    st.header("6. 조건문")
+    st.markdown("if, elif, else 사용[cite: 316]. 들여쓰기 중요! [cite: 321]")
+    run_code_block('n = 5\\nif n > 0:\\n    print("양수")\\nelse:\\n    print("음수")', "if")
+
+elif topic == "7. 반복문 (for, while)":
+    st.header("7. 반복문")
+    st.markdown("for문(횟수 지정) [cite: 465], while문(조건 지정)[cite: 466].")
+    run_code_block('for i in range(3):\\n    print("반복", i)', "loop")
+
+elif topic == "8. 리스트 (List)":
+    st.header("8. 리스트")
+    st.markdown("여러 자료를 저장하는 자료형[cite: 532]. 인덱스는 0부터 시작[cite: 550].")
+    run_code_block('arr = [10, 20, 30]\\nprint(arr[0])', "list")
+
+elif topic == "9. 함수 (Function)":
+    st.header("9. 함수")
+    st.markdown("명령어의 집합. def로 정의[cite: 596].")
+    run_code_block('def hello():\\n    return "Hello"\\n\\nprint(hello())', "func")
+
+elif topic == "10. 모듈 (Module)":
+    st.header("10. 모듈")
+    st.markdown("import로 가져와서 사용[cite: 663].")
+    run_code_block('import random\\nprint(random.randint(1, 10))', "module")
+
+st.divider()
+st.caption("경문고등학교 정보교사 임태현")
+`
+        }
+      });
     </script>
   </body>
 </html>
