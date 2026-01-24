@@ -1,3 +1,4 @@
+
 /*! coi-serviceworker v0.1.7 - Guido Zuidhof, licensed under MIT */
 let coepCredentialless = false;
 if (typeof window === 'undefined') {
