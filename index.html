@@ -5,9 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>경문고 정보수업 - Python 실습</title>
+    
+    <script src="coi-serviceworker.js"></script>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.58.1/build/stlite.css">
     <style>
-      /* 초기 로딩 화면 스타일 */
       #loader {
         position: fixed;
         top: 0;
@@ -26,7 +28,7 @@
         width: 50px;
         height: 50px;
         border: 5px solid #f3f3f3;
-        border-top: 5px solid #ff4b4b; /* Streamlit Red */
+        border-top: 5px solid #ff4b4b;
         border-radius: 50%;
         animation: spin 1s linear infinite;
         margin-bottom: 20px;
@@ -40,18 +42,16 @@
   <body>
     <div id="loader">
       <div class="spinner"></div>
-      <p>파이썬 실습 환경을 구성 중입니다...<br>(모바일은 10초 이상 걸릴 수 있습니다)</p>
+      <p>파이썬 실습 환경을 구성 중입니다...<br>(iOS는 초기 로딩 시 새로고침이 한 번 발생할 수 있습니다)</p>
     </div>
 
     <div id="root"></div>
     
     <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.58.1/build/stlite.js"></script>
     <script>
-      // 로딩이 완료되면 로딩 화면을 숨기는 로직은 stlite 내부적으로 처리되거나, 
-      // 앱이 렌더링되면서 #root가 덮어씌워지며 자연스럽게 해결됩니다.
-      
       stlite.mount({
-        requirements: [], 
+        // [팁] iOS 안정성을 위해 Streamlit 버전을 특정 버전으로 고정
+        requirements: ["streamlit==1.32.0"], 
         entrypoint: "streamlit_app.py",
         files: {
           "streamlit_app.py": `
@@ -60,18 +60,15 @@ import sys
 from io import StringIO
 import random
 
-# -----------------------------------------------------------------------------
-# [모바일 대응] 사이드바 자동 접힘 설정 (initial_sidebar_state="auto")
-# -----------------------------------------------------------------------------
+# 모바일 대응: 사이드바 자동 접힘
 st.set_page_config(
     layout="wide", 
     page_title="경문고 정보수업 Python 박살내기",
-    initial_sidebar_state="auto"  # 모바일에서는 사이드바가 자동으로 접힘
+    initial_sidebar_state="auto"
 )
 
 st.markdown("""
 <style>
-    /* 텍스트 에디터 스타일 (줄무늬 효과) */
     .stTextArea textarea {
         font-family: 'Courier New', monospace !important;
         font-size: 16px !important;
@@ -81,7 +78,6 @@ st.markdown("""
         background-attachment: local;
         border: 1px solid #ddd;
     }
-    /* 모바일에서 버튼 크기 확보 */
     .stButton button {
         width: 100%;
         margin-top: 5px;
@@ -93,7 +89,7 @@ st.markdown("""
         border-left: 5px solid #ff4b4b;
         font-family: monospace;
         white-space: pre-wrap;
-        font-size: 14px; /* 모바일 가독성 조정 */
+        font-size: 14px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -117,16 +113,11 @@ topic = st.sidebar.selectbox(
     ]
 )
 
-# -----------------------------------------------------------------------------
-# 공통 함수: 코드 실행기
-# -----------------------------------------------------------------------------
 def run_code_block(default_code, key_suffix):
-    # 모바일에서는 컬럼이 자동으로 수직 정렬되므로 그대로 둠
     col1, col2 = st.columns([1, 1])
     
     with col1:
         st.subheader("💻 코드 작성")
-        # 모바일 키보드 올라옴 방지를 위해 높이 약간 축소 가능성 있음
         code_input = st.text_area("코드 입력", value=default_code, height=250, key=f"editor_{key_suffix}")
         
         if st.button(f"▶ 실행하기", key=f"btn_{key_suffix}"):
@@ -151,9 +142,7 @@ def run_code_block(default_code, key_suffix):
                 st.subheader("결과 확인")
                 st.write("👈 실행 버튼을 눌러주세요.")
 
-# -----------------------------------------------------------------------------
-# 본문 콘텐츠 (간소화된 텍스트로 모바일 가독성 확보)
-# -----------------------------------------------------------------------------
+# --- 본문 내용 ---
 
 if topic == "1. 프로그래밍과 출력":
     st.header("1. 출력명령어 print()")
@@ -211,11 +200,8 @@ st.caption("경문고등학교 정보교사 임태현")
         }
       });
       
-      // stlite가 마운트되면 로더 제거
       const root = document.getElementById("root");
       const loader = document.getElementById("loader");
-      
-      // root 요소에 자식이 생기면(앱이 로드되면) 로더를 숨김
       const observer = new MutationObserver((mutations) => {
         if (root.hasChildNodes()) {
             loader.style.display = 'none';
@@ -223,7 +209,6 @@ st.caption("경문고등학교 정보교사 임태현")
         }
       });
       observer.observe(root, { childList: true });
-      
     </script>
   </body>
 </html>
