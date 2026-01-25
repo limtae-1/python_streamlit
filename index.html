@@ -4,211 +4,25 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>경문고 정보수업 - Python 실습</title>
-    
-    <script src="coi-serviceworker.js"></script>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.58.1/build/stlite.css">
-    <style>
-      #loader {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #ffffff;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        font-family: sans-serif;
-      }
-      .spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #ff4b4b;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 20px;
-      }
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    </style>
+    <title>경문고 Python 수업</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.31.0/build/stlite.css">
   </head>
   <body>
-    <div id="loader">
-      <div class="spinner"></div>
-      <p>파이썬 실습 환경을 구성 중입니다...<br>(iOS는 초기 로딩 시 새로고침이 한 번 발생할 수 있습니다)</p>
-    </div>
-
     <div id="root"></div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.58.1/build/stlite.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.31.0/build/stlite.js"></script>
     <script>
       stlite.mount({
-        // [팁] iOS 안정성을 위해 Streamlit 버전을 특정 버전으로 고정
-        requirements: ["streamlit==1.32.0"], 
-        entrypoint: "streamlit_app.py",
+        requirements: [], // 필요한 패키지가 있다면 여기에 추가 (예: ["pandas", "numpy"])
+        entrypoint: "app.py",
         files: {
-          "streamlit_app.py": `
-import streamlit as st
-import sys
-from io import StringIO
-import random
-
-# 모바일 대응: 사이드바 자동 접힘
-st.set_page_config(
-    layout="wide", 
-    page_title="경문고 정보수업 Python 박살내기",
-    initial_sidebar_state="auto"
-)
-
-st.markdown("""
-<style>
-    .stTextArea textarea {
-        font-family: 'Courier New', monospace !important;
-        font-size: 16px !important;
-        line-height: 24px !important;
-        background-image: linear-gradient(transparent 50%, rgba(200, 200, 200, 0.1) 50%);
-        background-size: 100% 48px;
-        background-attachment: local;
-        border: 1px solid #ddd;
-    }
-    .stButton button {
-        width: 100%;
-        margin-top: 5px;
-    }
-    .output-box {
-        background-color: #f0f2f6;
-        padding: 10px;
-        border-radius: 5px;
-        border-left: 5px solid #ff4b4b;
-        font-family: monospace;
-        white-space: pre-wrap;
-        font-size: 14px;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-st.sidebar.title("🐍 Python 박살내기")
-st.sidebar.info("정보 수업 실습 페이지")
-
-topic = st.sidebar.selectbox(
-    "주제 선택:",
-    [
-        "1. 프로그래밍과 출력",
-        "2. 입력 명령어",
-        "3. 변수와 주석",
-        "4. 자료형 (Data Type)",
-        "5. 연산자 (Operator)",
-        "6. 조건문 (if)",
-        "7. 반복문 (for, while)",
-        "8. 리스트 (List)",
-        "9. 함수 (Function)",
-        "10. 모듈 (Module)"
-    ]
-)
-
-def run_code_block(default_code, key_suffix):
-    col1, col2 = st.columns([1, 1])
-    
-    with col1:
-        st.subheader("💻 코드 작성")
-        code_input = st.text_area("코드 입력", value=default_code, height=250, key=f"editor_{key_suffix}")
-        
-        if st.button(f"▶ 실행하기", key=f"btn_{key_suffix}"):
-            with col2:
-                st.subheader("결과 확인")
-                old_stdout = sys.stdout
-                redirected_output = sys.stdout = StringIO()
-                
-                try:
-                    exec(code_input, globals())
-                    output = redirected_output.getvalue()
-                    if output:
-                        st.markdown(f'<div class="output-box">{output}</div>', unsafe_allow_html=True)
-                    else:
-                        st.info("실행 완료 (출력값 없음)")
-                except Exception as e:
-                    st.error(f"에러 발생:\\n{e}")
-                finally:
-                    sys.stdout = old_stdout
-        else:
-            with col2:
-                st.subheader("결과 확인")
-                st.write("👈 실행 버튼을 눌러주세요.")
-
-# --- 본문 내용 ---
-
-if topic == "1. 프로그래밍과 출력":
-    st.header("1. 출력명령어 print()")
-    st.markdown("컴퓨터에게 명령을 내리고 결과를 화면에 보여줍니다.")
-    run_code_block('print("Hello World")\\nprint(94)', "print")
-
-elif topic == "2. 입력 명령어":
-    st.header("2. 입력 명령어 input()")
-    st.markdown("사용자가 키보드로 입력한 값을 받습니다.")
-    run_code_block('name = input("이름이 뭐니? ")\\nprint(name + "님 반가워요!")', "input")
-
-elif topic == "3. 변수와 주석":
-    st.header("3. 변수와 주석")
-    st.markdown("데이터를 저장하는 '변수', 설명을 적는 '주석'.")
-    run_code_block('a = 100\\n# 이것은 주석입니다\\nprint(a)', "var")
-
-elif topic == "4. 자료형 (Data Type)":
-    st.header("4. 자료형")
-    st.markdown("정수(int), 실수(float), 문자열(str).")
-    run_code_block('a = 10\\nb = 3.14\\ns = "Hi"\\nprint(type(a))\\nprint(type(b))\\nprint(type(s))', "type")
-
-elif topic == "5. 연산자 (Operator)":
-    st.header("5. 연산자")
-    st.markdown("더하기(+), 빼기(-), 곱하기(*), 나누기(/).")
-    run_code_block('print(10 + 5)\\nprint(10 * 3)\\nprint(10 > 5)', "op")
-
-elif topic == "6. 조건문 (if)":
-    st.header("6. 조건문")
-    st.markdown("조건이 참(True)일 때만 실행합니다.")
-    run_code_block('score = 90\\nif score >= 80:\\n    print("합격!")\\nelse:\\n    print("불합격")', "if")
-
-elif topic == "7. 반복문 (for, while)":
-    st.header("7. 반복문")
-    st.markdown("명령을 여러 번 반복합니다.")
-    run_code_block('for i in range(3):\\n    print("반복", i)', "loop")
-
-elif topic == "8. 리스트 (List)":
-    st.header("8. 리스트")
-    st.markdown("여러 데이터를 순서대로 저장합니다.")
-    run_code_block('menu = ["짜장", "짬뽕", "탕수육"]\\nprint(menu[0])', "list")
-
-elif topic == "9. 함수 (Function)":
-    st.header("9. 함수")
-    st.markdown("명령어들의 묶음입니다.")
-    run_code_block('def greeting():\\n    return "안녕하세요!"\\n\\nprint(greeting())', "func")
-
-elif topic == "10. 모듈 (Module)":
-    st.header("10. 모듈")
-    st.markdown("미리 만들어진 기능을 가져옵니다(import).")
-    run_code_block('import random\\nprint(random.randint(1, 100))', "module")
-
-st.divider()
-st.caption("경문고등학교 정보교사 임태현")
-`
-        }
-      });
-      
-      const root = document.getElementById("root");
-      const loader = document.getElementById("loader");
-      const observer = new MutationObserver((mutations) => {
-        if (root.hasChildNodes()) {
-            loader.style.display = 'none';
-            observer.disconnect();
-        }
-      });
-      observer.observe(root, { childList: true });
+          "app.py": {
+            url: "./app.py",
+          },
+          "lecture_data.json": {
+            url: "./lecture_data.json",
+          },
+        },
+      }, document.getElementById("root"));
     </script>
   </body>
 </html>
