@@ -1,0 +1,12 @@
+[
+    {
+        "sub_title": "01. 출력하기 (Print)",
+        "content": "파이썬에서 화면에 글자를 출력할 때는 print() 함수를 사용합니다.",
+        "default_code": "# 아래에 'Hello World'를 출력하는 코드를 작성해보세요.\n\nprint('Hello World')"
+    },
+    {
+        "sub_title": "02. 변수와 자료형",
+        "content": "변수는 데이터를 담는 그릇입니다. 정수, 실수, 문자열 등이 있습니다.",
+        "default_code": "# a에 10을 넣고 출력해보세요.\na = 10\nprint(a)"
+    }
+]
