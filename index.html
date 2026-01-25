@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>정보 수업 파이썬 실습실</title>
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.31.0/build/stlite.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      stlite.mount({
+        requirements: ["pandas", "matplotlib", "numpy"], // 필요한 라이브러리 명시
+        entrypoint: "app.py", // 시작 파일
+        files: {
+          "app.py": {
+            url: "./app.py", // 같은 폴더의 app.py 로드
+          },
+          "data/menu.json": {
+            url: "./data/menu.json",
+          },
+          "data/01_python.json": {
+            url: "./data/01_python.json",
+          },
+          "data/02_data.json": {
+            url: "./data/02_data.json",
+          },
+          "data/03_ai.json": {
+            url: "./data/03_ai.json",
+          }
+        },
+      }, document.getElementById("root"));
+    </script>
+  </body>
+</html>
