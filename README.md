@@ -6,7 +6,7 @@
 
     ├── index.html            (Pyodide 및 st-lite 구동용 메인 페이지)
 
-    ├── app.py                (Streamlit 파이썬 로직 - 실제 화면 구성)
+    ├── app.py                (Streamlit 파이썬 로직 - 실제 화면 구성) / (구동 문제로 index.html 코드에 포함)
 
     └── data/                 (학습 자료 폴더)
    
