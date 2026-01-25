@@ -1,12 +1,48 @@
 [
     {
         "sub_title": "01. 출력하기 (Print)",
-        "content": "파이썬에서 화면에 글자를 출력할 때는 print() 함수를 사용합니다.",
-        "default_code": "# 아래에 'Hello World'를 출력하는 코드를 작성해보세요.\n\nprint('Hello World')"
+        "blocks": [
+            {
+                "type": "text",
+                "content": "### 1. Print 함수란?\n파이썬에서 화면에 결과를 보여주기 위해 사용하는 가장 기초적인 함수입니다."
+            },
+            {
+                "type": "code",
+                "guide": "아래 코드창에 'Hello World'를 입력하고 실행 버튼을 눌러보세요.",
+                "content": "print('Hello World')"
+            },
+            {
+                "type": "text",
+                "content": "💡 **Tip:** 따옴표는 홑따옴표(')와 쌍따옴표(\") 모두 사용 가능합니다."
+            }
+        ]
     },
     {
         "sub_title": "02. 변수와 자료형",
-        "content": "변수는 데이터를 담는 그릇입니다. 정수, 실수, 문자열 등이 있습니다.",
-        "default_code": "# a에 10을 넣고 출력해보세요.\na = 10\nprint(a)"
+        "blocks": [
+            {
+                "type": "text",
+                "content": "### 변수의 개념\n변수는 데이터를 담는 그릇과 같습니다. 아래 영상을 먼저 시청해주세요."
+            },
+            {
+                "type": "video",
+                "url": "https://www.youtube.com/watch?v=kWiCuklohdY",
+                "caption": "참고 영상: 파이썬 변수 기초 (예시 영상입니다)"
+            },
+            {
+                "type": "text",
+                "content": "영상을 잘 보셨나요? 이제 직접 숫자를 변수에 담아봅시다."
+            },
+            {
+                "type": "code",
+                "guide": "문제 1. 변수 a에 100을 넣고 출력하세요.",
+                "content": "a = 0 # 여기를 100으로 고치세요\nprint(a)"
+            },
+            {
+                "type": "code",
+                "guide": "문제 2. 변수 b에 자신의 이름을 문자열로 넣고 출력하세요.",
+                "content": "b = '홍길동'\nprint(b)"
+            }
+        ]
     }
 ]
