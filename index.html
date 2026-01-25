@@ -4,10 +4,13 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>정보 수업 파이썬 실습실 테스트3</title>
+    <title>정보 수업 파이썬 실습실</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser/build/stlite.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@stlite/browser/build/stlite.js"></script>
+    <!-- ✅ 버전 고정 권장 (예시: 0.85.1) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css"
+    />
 
     <style>
       #error-log {
@@ -25,7 +28,7 @@
       }
     </style>
     <script>
-      window.onerror = function (message, source, lineno, colno, error) {
+      window.onerror = function (message, source, lineno) {
         var log = document.getElementById("error-log");
         if (log) {
           log.style.display = "block";
@@ -47,13 +50,14 @@
     <div id="error-log"></div>
     <div id="root"></div>
 
-    <script>
-      // iOS 감지
+    <!-- ✅ 핵심: stlite는 전역변수가 아니라 ESM import로 mount를 가져와야 함 -->
+    <script type="module">
+      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js";
+
       const isIOS =
         /iPad|iPhone|iPod/.test(navigator.userAgent) ||
         (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-      // ✅ app.py는 반드시 아래 APP_PY 문자열 안에만 존재해야 합니다.
       const APP_PY = String.raw`
 import streamlit as st
 import json
@@ -63,7 +67,6 @@ import os
 
 st.set_page_config(layout="wide", page_title="정보 수업 파이썬 실습")
 
-# --- CSS 스타일링 ---
 st.markdown("""
 <style>
     .stTextArea textarea {
@@ -79,13 +82,10 @@ st.markdown("""
         font-family: 'Courier New', monospace;
         margin-top: 10px;
     }
-    .block-container {
-        padding-top: 2rem;
-    }
+    .block-container { padding-top: 2rem; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- 데이터 로드 함수 ---
 def load_json(filepath):
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
@@ -93,7 +93,6 @@ def load_json(filepath):
     except Exception:
         return []
 
-# --- 사이드바 (메뉴) ---
 st.sidebar.title("🐍 정보 수업 실습실")
 st.sidebar.header("학습 주제 선택")
 
@@ -102,58 +101,47 @@ menu_data = load_json("data/menu.json")
 if not menu_data:
     st.sidebar.error("메뉴 데이터(data/menu.json)가 없습니다.")
 else:
-    # 1. 대단원 선택
     menu_options = {item['title']: item for item in menu_data}
     selected_main_title = st.sidebar.selectbox("대단원 선택", list(menu_options.keys()))
 
     if selected_main_title:
         selected_file = menu_options[selected_main_title]['file']
         chapter_data = load_json(os.path.join("data", selected_file))
-        
+
         if not chapter_data:
             st.error(f"{selected_file} 파일을 읽을 수 없습니다.")
         else:
-            # 2. 소단원(챕터) 선택
             chapter_titles = [item['sub_title'] for item in chapter_data]
             selected_chapter_title = st.sidebar.selectbox("학습 내용 선택", chapter_titles)
-            
-            # 현재 선택된 챕터 데이터 가져오기
+
             current_chapter = next((item for item in chapter_data if item['sub_title'] == selected_chapter_title), None)
 
-            # --- 메인 화면 렌더링 (블록 조립 방식) ---
             if current_chapter:
                 st.header(f"📝 {current_chapter['sub_title']}")
                 st.divider()
 
-                # 'blocks' 리스트가 있는지 확인 (없으면 구버전 호환 또는 빈화면)
                 blocks = current_chapter.get('blocks', [])
 
-                # 블록 하나씩 순서대로 그리기
                 for index, block in enumerate(blocks):
                     b_type = block.get('type', 'text')
-                    
-                    # 1) 텍스트(Markdown) 블록
+
                     if b_type == 'text':
                         st.markdown(block.get('content', ''))
 
-                    # 2) 코드 에디터 블록
                     elif b_type == 'code':
-                        st.info(block.get('guide', '아래 코드를 실행해보세요.')) # 가이드 문구
-                        
+                        st.info(block.get('guide', '아래 코드를 실행해보세요.'))
                         col1, col2 = st.columns([1, 1])
-                        
-                        # 중요: 위젯마다 고유한 key가 필요하므로 index를 활용함
+
                         unique_key = f"editor_{selected_chapter_title}_{index}"
-                        
+
                         with col1:
                             user_code = st.text_area(
-                                "Code", 
+                                "Code",
                                 value=block.get('content', ''),
                                 height=200,
                                 key=unique_key,
                                 label_visibility="collapsed"
                             )
-                            # 실행 버튼
                             if st.button("▶️ 실행하기", key=f"btn_{unique_key}", type="primary"):
                                 with col2:
                                     old_stdout = sys.stdout
@@ -163,38 +151,35 @@ else:
                                         exec(user_code)
                                         output = redirected_output.getvalue()
                                         if output:
-                                            st.markdown(f"<div class='output-box'>{output.replace(chr(10), '<br>')}</div>", unsafe_allow_html=True)
+                                            st.markdown(
+                                                f"<div class='output-box'>{output.replace(chr(10), '<br>')}</div>",
+                                                unsafe_allow_html=True
+                                            )
                                         else:
                                             st.warning("출력 결과가 없습니다.")
                                     except Exception as e:
                                         st.error(f"에러 발생:\\n{e}")
                                     finally:
                                         sys.stdout = old_stdout
-                        
-                        # 오른쪽 컬럼(결과창) 안내 문구 (실행 전)
+
                         with col2:
-                            # 버튼 상태 체크가 애매할 수 있어 "항상 안내"로 처리해도 무방합니다.
                             st.caption("👈 실행 버튼을 누르면 결과가 여기에 표시됩니다.")
 
-                    # 3) 비디오 블록
                     elif b_type == 'video':
                         st.video(block.get('url'))
                         if 'caption' in block:
                             st.caption(block['caption'])
 
-                    # 4) 이미지 블록
                     elif b_type == 'image':
                         st.image(block.get('url'), caption=block.get('caption', ''))
-                    
-                    # 블록 간 간격 추가
-                    st.write("") 
-                    st.write("") 
+
+                    st.write("")
+                    st.write("")
 `;
 
-      // stlite 마운트
-      stlite.mount(
+      mount(
         {
-          // iOS에서는 무거운 패키지 로딩을 피해서 우선 안정화
+          // iOS에서는 우선 가볍게(필요한 단원에서만 패키지 추가 권장)
           requirements: isIOS ? [] : ["pandas", "matplotlib", "numpy"],
           entrypoint: "app.py",
           files: {
