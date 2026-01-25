@@ -11,16 +11,172 @@
     <div id="root"></div>
     <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.31.0/build/stlite.js"></script>
     <script>
+      // 1. 수업 데이터 (JSON 내용)
+      const lectureData = {
+        "chapters": [
+          {
+            "id": "ch1",
+            "title": "1. 출력명령어 (Print)",
+            "description": "Python 언어에서 화면에 출력을 하는 명령어는 print()입니다.",
+            "content": "print() 명령어를 통해 문자, 데이터 등 다양한 자료를 화면에 출력할 수 있습니다. 문자는 따옴표(\" \")로 감싸주어야 합니다.",
+            "default_code": "# 화면에 Hello World를 출력해보세요.\nprint(\"Hello World\")\nprint(94)"
+          },
+          {
+            "id": "ch2",
+            "title": "2. 입력명령어 (Input)",
+            "description": "사용자가 자료를 입력할 수 있도록 하는 명령어는 input()입니다.",
+            "content": "input()으로 입력받은 데이터는 기본적으로 '문자'로 저장됩니다. 변수에 담아 출력해봅시다.",
+            "default_code": "# 이름을 입력받고 출력해보세요.\nn = input(\"이름을 입력하세요: \")\nprint(n)"
+          },
+          {
+            "id": "ch3",
+            "title": "3. 변수 (Variable)",
+            "description": "자료를 저장하기 위한 그릇(저장 공간)을 변수라고 합니다.",
+            "content": "변수명은 영문자, 숫자, 언더바(_)를 사용할 수 있으며, 숫자로 시작할 수 없습니다. '=' 기호는 '같다'가 아니라 '대입'을 의미합니다.",
+            "default_code": "n = 10\nm = \"Hello\"\nprint(n)\nprint(m)"
+          },
+          {
+            "id": "ch4",
+            "title": "4. 자료형 (Data Type)",
+            "description": "정수(int), 실수(float), 문자열(str) 등 데이터의 종류를 의미합니다.",
+            "content": "type() 함수를 사용하면 해당 데이터가 어떤 자료형인지 확인할 수 있습니다.",
+            "default_code": "a = 10\nb = 10.5\nc = \"경문고\"\nprint(type(a))\nprint(type(b))\nprint(type(c))"
+          },
+          {
+            "id": "ch5",
+            "title": "5. 조건문 (If)",
+            "description": "조건에 따라 코드를 실행하거나 실행하지 않게 만드는 구문입니다.",
+            "content": "들여쓰기(Indentation)가 매우 중요합니다. 조건 끝에는 반드시 콜론(:)을 찍어야 합니다.",
+            "default_code": "n = 5\nif n > 0:\n    print(\"양수입니다.\")\nelse:\n    print(\"음수가 아닙니다.\")"
+          },
+          {
+            "id": "ch6",
+            "title": "6. 반복문 (For/While)",
+            "description": "일정한 구간의 명령을 반복해서 실행하는 구조입니다.",
+            "content": "for문은 횟수가 명확할 때, while문은 조건이 맞을 때까지 반복할 때 주로 사용합니다.",
+            "default_code": "# 0부터 4까지 반복\nfor i in range(5):\n    print(\"Python\", i)"
+          },
+          {
+            "id": "ch7",
+            "title": "7. 리스트 (List)",
+            "description": "여러 가지 자료를 하나의 변수에 순서대로 저장할 수 있는 자료형입니다.",
+            "content": "대괄호 []를 사용하며, 인덱스(순서)는 0번부터 시작합니다.",
+            "default_code": "arr = [17, 66.5, \"경문\", \"정보\"]\nprint(arr[0])\nprint(arr[2])"
+          }
+        ]
+      };
+
+      // 2. 파이썬 앱 코드 (app.py 내용)
+      const pythonCode = `
+import streamlit as st
+import json
+import sys
+from io import StringIO
+
+st.set_page_config(page_title="경문고 정보수업 Python 박살내기", layout="wide")
+
+st.markdown("""
+<style>
+    body { font-family: 'Noto Sans KR', sans-serif; }
+    .stTextArea textarea {
+        background-color: #f0f2f6;
+        font-family: 'Courier New', monospace;
+        line-height: 1.5;
+        font-size: 14px;
+        background-image: linear-gradient(#f0f2f6 50%, #e6e9ef 50%);
+        background-size: 100% 3rem;
+        background-attachment: local;
+        padding-left: 35px;
+    }
+    .code-container { position: relative; }
+    .line-numbers {
+        position: absolute;
+        top: 2px; left: 5px; width: 25px; height: 100%;
+        color: #888; font-family: 'Courier New', monospace;
+        font-size: 14px; line-height: 1.5; text-align: right;
+        overflow: hidden; pointer-events: none; z-index: 10; opacity: 0.7;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+@st.cache_data
+def load_data():
+    # 파일 시스템에서 직접 읽는 대신 가상 파일 시스템의 파일을 읽습니다.
+    with open('lecture_data.json', 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+try:
+    data = load_data()
+except Exception as e:
+    st.error(f"데이터 로드 오류: {e}")
+    st.stop()
+
+st.sidebar.title("🐍 Python 박살내기!!")
+chapter_list = [f"{ch['title']}" for ch in data['chapters']]
+selected_chapter_name = st.sidebar.selectbox("학습할 단원을 선택하세요:", chapter_list)
+
+selected_chapter = next(item for item in data['chapters'] if item['title'] == selected_chapter_name)
+
+st.title(selected_chapter['title'])
+st.info(selected_chapter['description'])
+st.markdown(selected_chapter['content'])
+
+st.write("---")
+st.subheader("💻 실습 코딩")
+
+col1, col2 = st.columns([1, 1])
+
+with col1:
+    st.markdown("**코드 작성**")
+    line_numbers = "<br>".join([str(i) for i in range(1, 21)])
+    st.markdown(f"""
+    <div class="code-container">
+        <div class="line-numbers">{line_numbers}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    code_input = st.text_area(
+        label="Code Editor",
+        value=selected_chapter['default_code'],
+        height=300,
+        label_visibility="collapsed",
+        key=f"editor_{selected_chapter['id']}"
+    )
+
+    if st.button("▶ 실행하기", type="primary"):
+        run_code = True
+    else:
+        run_code = False
+
+with col2:
+    st.markdown("**실행 결과**")
+    result_container = st.container(border=True)
+    
+    if run_code:
+        old_stdout = sys.stdout
+        redirected_output = sys.stdout = StringIO()
+        try:
+            exec(code_input)
+            output = redirected_output.getvalue()
+            result_container.code(output if output else "출력 결과가 없습니다.")
+        except Exception as e:
+            result_container.error(f"에러 발생:\\n{e}")
+        finally:
+            sys.stdout = old_stdout
+    else:
+        result_container.write("왼쪽의 [실행하기] 버튼을 눌러보세요.")
+
+st.write("---")
+st.caption("교재 출처: Python 박살내기!! (경문고 정보수업)")
+`;
+
+      // 3. stlite 마운트 (가상 파일 시스템에 파일 생성)
       stlite.mount({
-        requirements: [], // 필요한 패키지가 있다면 여기에 추가 (예: ["pandas", "numpy"])
+        requirements: [],
         entrypoint: "app.py",
         files: {
-          "app.py": {
-            url: "./app.py",
-          },
-          "lecture_data.json": {
-            url: "./lecture_data.json",
-          },
+          "app.py": pythonCode,
+          "lecture_data.json": JSON.stringify(lectureData, null, 2)
         },
       }, document.getElementById("root"));
     </script>
