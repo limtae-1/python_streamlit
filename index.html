@@ -5,16 +5,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>정보 수업 파이썬 실습실</title>
-    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.53.0/build/stlite.js"></script>
-  </head>
-  <body>
-    <div id="root"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser/build/stlite.css">
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/browser/build/stlite.js"></script>
     <script>
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    
       stlite.mount({
-        requirements: ["pandas", "matplotlib", "numpy"], 
-        entrypoint: "app.py", 
+        requirements: isIOS ? [] : ["pandas", "matplotlib", "numpy"],
+        entrypoint: "app.py",
         files: {
-          "app.py": `
+          "app.py": `...생략...`,
+          "data/menu.json": { url: "./data/menu.json" },
+          "data/01_python.json": { url: "./data/01_python.json" },
+          "data/02_data.json": { url: "./data/02_data.json" },
+          "data/03_ai.json": { url: "./data/03_ai.json" }
+        },
+      }, document.getElementById("root"));
+</script>
 import streamlit as st
 import json
 import sys
