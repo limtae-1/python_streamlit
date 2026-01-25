@@ -7,8 +7,51 @@
     <title>정보 수업 파이썬 실습실</title>
     
     <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        color: white;
+      }
+      
+      .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      #loading-text {
+        font-size: 18px;
+        margin-top: 10px;
+        text-align: center;
+        padding: 0 20px;
+      }
+      
       #error-log {
-        display: none; /* 평소에는 숨김 */
+        display: none;
         background: #ffcccc;
         color: #cc0000;
         padding: 10px;
@@ -17,75 +60,239 @@
         white-space: pre-wrap;
         font-family: monospace;
         font-size: 12px;
-        z-index: 9999;
-        position: relative;
+        z-index: 10000;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      
+      #root {
+        min-height: 100vh;
       }
     </style>
+    
     <script>
+      // 에러 로깅
       window.onerror = function(message, source, lineno, colno, error) {
         var log = document.getElementById('error-log');
         log.style.display = 'block';
         log.innerHTML += "Error: " + message + "\nLine: " + lineno + "\nSource: " + source + "\n\n";
+        console.error('Global error:', message, source, lineno);
       };
+      
       window.onunhandledrejection = function(event) {
         var log = document.getElementById('error-log');
         log.style.display = 'block';
         log.innerHTML += "Promise Error: " + event.reason + "\n\n";
+        console.error('Unhandled promise rejection:', event.reason);
       };
+      
+      // 로딩 완료 후 로딩 화면 제거
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var loadingScreen = document.getElementById('loading-screen');
+          if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            loadingScreen.style.transition = 'opacity 0.5s';
+            setTimeout(function() {
+              loadingScreen.style.display = 'none';
+            }, 500);
+          }
+        }, 2000); // stlite 로딩 시간 고려
+      });
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.53.0/build/stlite.js"></script>
   </head>
   <body>
+    <!-- 로딩 화면 -->
+    <div id="loading-screen">
+      <div class="spinner"></div>
+      <h2>🐍 파이썬 실습실</h2>
+      <div id="loading-text">
+        로딩 중...<br>
+        <small>iOS/iPad에서는 최대 30초 정도 소요될 수 있습니다</small>
+      </div>
+    </div>
+    
+    <!-- 에러 로그 -->
     <div id="error-log"></div>
     
+    <!-- 메인 컨텐츠 -->
     <div id="root"></div>
+    
     <script>
+      // stlite 마운트
       stlite.mount({
-        /* [테스트 1] 만약 아이폰에서 계속 멈춘다면 아래 requirements를 비워보세요. 
-           메모리 부족 문제인지 확인하기 위함입니다.
-           requirements: [], 
-        */
-        requirements: ["pandas", "matplotlib", "numpy"], 
-        entrypoint: "app.py", 
+        // iOS 메모리 최적화: requirements 최소화
+        requirements: [], // 필요시 ["pandas"] 만 추가
+        
+        entrypoint: "app.py",
+        
         files: {
           "app.py": `
 import streamlit as st
 import json
 import sys
 from io import StringIO
-import os
 
 st.set_page_config(layout="wide", page_title="정보 수업 파이썬 실습")
 
 st.markdown("""
 <style>
-    .stTextArea textarea { background-color: #f0f2f6; font-family: 'Courier New'; }
-    .output-box { background-color: #262730; color: white; padding: 10px; border-radius: 5px; }
+    .stTextArea textarea { 
+        background-color: #f0f2f6; 
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+    }
+    .output-box { 
+        background-color: #262730; 
+        color: white; 
+        padding: 15px; 
+        border-radius: 5px;
+        font-family: monospace;
+        min-height: 50px;
+    }
+    .stButton button {
+        width: 100%;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-def load_json(filepath):
+def load_json_from_string(json_string):
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except Exception:
+        return json.loads(json_string)
+    except Exception as e:
+        st.error(f"JSON 로딩 오류: {e}")
         return []
 
 st.sidebar.title("🐍 정보 수업")
 st.sidebar.header("학습 주제 선택")
 
-menu_data = load_json("data/menu.json")
+# JSON 데이터를 직접 문자열로 임베딩 (iOS 파일 로딩 문제 해결)
+menu_json = """[
+    {"title": "1. 파이썬 기초", "file": "01_python.json"},
+    {"title": "2. 데이터 분석", "file": "02_data.json"},
+    {"title": "3. 인공지능", "file": "03_ai.json"}
+]"""
+
+python_json = """[
+    {
+        "sub_title": "01. 출력하기 (Print)",
+        "blocks": [
+            {
+                "type": "text",
+                "content": "### 1. Print 함수란?\\n파이썬에서 화면에 결과를 보여주기 위해 사용하는 가장 기초적인 함수입니다."
+            },
+            {
+                "type": "code",
+                "guide": "아래 코드창에 'Hello World'를 입력하고 실행 버튼을 눌러보세요.",
+                "content": "print('Hello World')"
+            },
+            {
+                "type": "text",
+                "content": "💡 **Tip:** 따옴표는 홑따옴표(')와 쌍따옴표(\\") 모두 사용 가능합니다."
+            },
+            {
+                "type": "code",
+                "guide": "연습문제: 자신의 이름을 출력해보세요.",
+                "content": "print('여기에 이름 입력')"
+            }
+        ]
+    },
+    {
+        "sub_title": "02. 변수와 자료형",
+        "blocks": [
+            {
+                "type": "text",
+                "content": "### 변수의 개념\\n변수는 데이터를 담는 그릇과 같습니다. 아래 영상을 먼저 시청해주세요."
+            },
+            {
+                "type": "video",
+                "url": "https://www.youtube.com/watch?v=kWiCuklohdY"
+            },
+            {
+                "type": "text",
+                "content": "영상을 잘 보셨나요? 이제 직접 숫자를 변수에 담아봅시다."
+            },
+            {
+                "type": "code",
+                "guide": "문제 1. 변수 a에 100을 넣고 출력하세요.",
+                "content": "a = 0  # 여기를 100으로 고치세요\\nprint(a)"
+            },
+            {
+                "type": "code",
+                "guide": "문제 2. 변수 b에 자신의 이름을 문자열로 넣고 출력하세요.",
+                "content": "b = '홍길동'\\nprint(b)"
+            },
+            {
+                "type": "text",
+                "content": "### 자료형의 종류\\n- **정수(int)**: 1, 2, 100 등\\n- **실수(float)**: 3.14, 2.5 등\\n- **문자열(str)**: 'Hello', \\"Python\\" 등\\n- **불린(bool)**: True, False"
+            },
+            {
+                "type": "code",
+                "guide": "문제 3. 각 변수의 자료형을 출력해보세요.",
+                "content": "num = 10\\npi = 3.14\\nname = 'Python'\\n\\nprint(type(num))\\nprint(type(pi))\\nprint(type(name))"
+            }
+        ]
+    }
+]"""
+
+data_json = """[
+    {
+        "sub_title": "01. 리스트 기초",
+        "blocks": [
+            {
+                "type": "text",
+                "content": "### 리스트란?\\n여러 개의 데이터를 한 번에 담을 수 있는 자료구조입니다."
+            },
+            {
+                "type": "code",
+                "guide": "리스트를 만들고 출력해보세요.",
+                "content": "fruits = ['사과', '바나나', '오렌지']\\nprint(fruits)\\nprint(fruits[0])  # 첫 번째 요소"
+            }
+        ]
+    }
+]"""
+
+ai_json = """[
+    {
+        "sub_title": "01. 인공지능 소개",
+        "blocks": [
+            {
+                "type": "text",
+                "content": "### 인공지능이란?\\n인간의 지능을 컴퓨터로 구현한 기술입니다."
+            },
+            {
+                "type": "code",
+                "guide": "간단한 AI 예제: 숫자 예측",
+                "content": "# 간단한 패턴 학습\\nnumbers = [2, 4, 6, 8]\\nnext_num = numbers[-1] + 2\\nprint(f'다음 숫자는: {next_num}')"
+            }
+        ]
+    }
+]"""
+
+# 데이터 로딩
+menu_data = load_json_from_string(menu_json)
+data_map = {
+    "01_python.json": python_json,
+    "02_data.json": data_json,
+    "03_ai.json": ai_json
+}
 
 if not menu_data:
-    st.sidebar.warning("메뉴 로딩 중...") # 로딩 중 표시
+    st.sidebar.warning("메뉴 로딩 중...")
 else:
     menu_options = {item['title']: item for item in menu_data}
     selected_main_title = st.sidebar.selectbox("대단원 선택", list(menu_options.keys()))
 
     if selected_main_title:
         selected_file = menu_options[selected_main_title]['file']
-        chapter_data = load_json(os.path.join("data", selected_file))
+        chapter_json = data_map.get(selected_file, "[]")
+        chapter_data = load_json_from_string(chapter_json)
         
         if chapter_data:
             chapter_titles = [item['sub_title'] for item in chapter_data]
@@ -110,18 +317,42 @@ else:
                         unique_key = f"ed_{selected_chapter_title}_{index}"
                         
                         with col1:
-                            user_code = st.text_area("Code", value=block.get('content', ''), height=200, key=unique_key)
-                            if st.button("▶️ 실행", key=f"btn_{unique_key}", type="primary"):
-                                with col2:
-                                    old_stdout = sys.stdout
-                                    sys.stdout = redirected_output = StringIO()
-                                    try:
-                                        exec(user_code)
-                                        st.markdown(f"<div class='output-box'>{redirected_output.getvalue().replace(chr(10), '<br>')}</div>", unsafe_allow_html=True)
-                                    except Exception as e:
-                                        st.error(f"에러: {e}")
-                                    finally:
-                                        sys.stdout = old_stdout
+                            user_code = st.text_area(
+                                "코드 입력", 
+                                value=block.get('content', ''), 
+                                height=200, 
+                                key=unique_key,
+                                label_visibility="collapsed"
+                            )
+                            run_button = st.button(
+                                "▶️ 실행", 
+                                key=f"btn_{unique_key}", 
+                                type="primary",
+                                use_container_width=True
+                            )
+                        
+                        with col2:
+                            st.markdown("**실행 결과:**")
+                            if run_button:
+                                old_stdout = sys.stdout
+                                sys.stdout = redirected_output = StringIO()
+                                try:
+                                    exec(user_code)
+                                    output = redirected_output.getvalue()
+                                    if output:
+                                        st.markdown(
+                                            f"<div class='output-box'>{output.replace(chr(10), '<br>')}</div>", 
+                                            unsafe_allow_html=True
+                                        )
+                                    else:
+                                        st.markdown(
+                                            "<div class='output-box'>출력 없음</div>", 
+                                            unsafe_allow_html=True
+                                        )
+                                except Exception as e:
+                                    st.error(f"⚠️ 에러: {e}")
+                                finally:
+                                    sys.stdout = old_stdout
 
                     elif b_type == 'video':
                         st.video(block.get('url'))
@@ -129,13 +360,13 @@ else:
                     elif b_type == 'image':
                         st.image(block.get('url'))
                     
-                    st.write("") 
-`,
-          "data/menu.json": { url: "./data/menu.json" },
-          "data/01_python.json": { url: "./data/01_python.json" },
-          "data/02_data.json": { url: "./data/02_data.json" },
-          "data/03_ai.json": { url: "./data/03_ai.json" }
-        },
+                    st.write("")
+
+# 푸터
+st.sidebar.divider()
+st.sidebar.caption("🍎 iOS/iPad 사용자는 로딩에 시간이 걸릴 수 있습니다.")
+`
+        }
       }, document.getElementById("root"));
     </script>
   </body>
