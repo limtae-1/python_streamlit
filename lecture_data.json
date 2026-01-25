@@ -1,0 +1,53 @@
+{
+  "chapters": [
+    {
+      "id": "ch1",
+      "title": "1. 출력명령어 (Print)",
+      "description": "Python 언어에서 화면에 출력을 하는 명령어는 print()입니다.",
+      "content": "print() 명령어를 통해 문자, 데이터 등 다양한 자료를 화면에 출력할 수 있습니다. 문자는 따옴표(\" \")로 감싸주어야 합니다.",
+      "default_code": "# 화면에 Hello World를 출력해보세요.\nprint(\"Hello World\")\nprint(94)"
+    },
+    {
+      "id": "ch2",
+      "title": "2. 입력명령어 (Input)",
+      "description": "사용자가 자료를 입력할 수 있도록 하는 명령어는 input()입니다.",
+      "content": "input()으로 입력받은 데이터는 기본적으로 '문자'로 저장됩니다. 변수에 담아 출력해봅시다.",
+      "default_code": "# 이름을 입력받고 출력해보세요.\nn = input(\"이름을 입력하세요: \")\nprint(n)"
+    },
+    {
+      "id": "ch3",
+      "title": "3. 변수 (Variable)",
+      "description": "자료를 저장하기 위한 그릇(저장 공간)을 변수라고 합니다.",
+      "content": "변수명은 영문자, 숫자, 언더바(_)를 사용할 수 있으며, 숫자로 시작할 수 없습니다. '=' 기호는 '같다'가 아니라 '대입'을 의미합니다.",
+      "default_code": "n = 10\nm = \"Hello\"\nprint(n)\nprint(m)"
+    },
+    {
+      "id": "ch4",
+      "title": "4. 자료형 (Data Type)",
+      "description": "정수(int), 실수(float), 문자열(str) 등 데이터의 종류를 의미합니다.",
+      "content": "type() 함수를 사용하면 해당 데이터가 어떤 자료형인지 확인할 수 있습니다.",
+      "default_code": "a = 10\nb = 10.5\nc = \"경문고\"\nprint(type(a))\nprint(type(b))\nprint(type(c))"
+    },
+    {
+      "id": "ch5",
+      "title": "5. 조건문 (If)",
+      "description": "조건에 따라 코드를 실행하거나 실행하지 않게 만드는 구문입니다.",
+      "content": "들여쓰기(Indentation)가 매우 중요합니다. 조건 끝에는 반드시 콜론(:)을 찍어야 합니다.",
+      "default_code": "n = 5\nif n > 0:\n    print(\"양수입니다.\")\nelse:\n    print(\"음수가 아닙니다.\")"
+    },
+    {
+      "id": "ch6",
+      "title": "6. 반복문 (For/While)",
+      "description": "일정한 구간의 명령을 반복해서 실행하는 구조입니다.",
+      "content": "for문은 횟수가 명확할 때, while문은 조건이 맞을 때까지 반복할 때 주로 사용합니다.",
+      "default_code": "# 0부터 4까지 반복\nfor i in range(5):\n    print(\"Python\", i)"
+    },
+    {
+      "id": "ch7",
+      "title": "7. 리스트 (List)",
+      "description": "여러 가지 자료를 하나의 변수에 순서대로 저장할 수 있는 자료형입니다.",
+      "content": "대괄호 []를 사용하며, 인덱스(순서)는 0번부터 시작합니다.",
+      "default_code": "arr = [17, 66.5, \"경문\", \"정보\"]\nprint(arr[0])\nprint(arr[2])"
+    }
+  ]
+}
