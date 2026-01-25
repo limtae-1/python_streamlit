@@ -1,29 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>정보 수업 파이썬 실습실</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser/build/stlite.css">
+    <title>정보 수업 파이썬 실습실 테스트3</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser/build/stlite.css" />
     <script src="https://cdn.jsdelivr.net/npm/@stlite/browser/build/stlite.js"></script>
+
+    <style>
+      #error-log {
+        display: none;
+        background: #ffcccc;
+        color: #cc0000;
+        padding: 10px;
+        border: 2px solid red;
+        margin: 10px;
+        white-space: pre-wrap;
+        font-family: monospace;
+        font-size: 12px;
+        z-index: 9999;
+        position: relative;
+      }
+    </style>
     <script>
+      window.onerror = function (message, source, lineno, colno, error) {
+        var log = document.getElementById("error-log");
+        if (log) {
+          log.style.display = "block";
+          log.textContent +=
+            "Error: " + message + "\nLine: " + lineno + "\nSource: " + source + "\n\n";
+        }
+      };
+      window.onunhandledrejection = function (event) {
+        var log = document.getElementById("error-log");
+        if (log) {
+          log.style.display = "block";
+          log.textContent += "Promise Error: " + event.reason + "\n\n";
+        }
+      };
+    </script>
+  </head>
+
+  <body>
+    <div id="error-log"></div>
+    <div id="root"></div>
+
+    <script>
+      // iOS 감지
       const isIOS =
         /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    
-      stlite.mount({
-        requirements: isIOS ? [] : ["pandas", "matplotlib", "numpy"],
-        entrypoint: "app.py",
-        files: {
-          "app.py": `...생략...`,
-          "data/menu.json": { url: "./data/menu.json" },
-          "data/01_python.json": { url: "./data/01_python.json" },
-          "data/02_data.json": { url: "./data/02_data.json" },
-          "data/03_ai.json": { url: "./data/03_ai.json" }
-        },
-      }, document.getElementById("root"));
-</script>
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+      // ✅ app.py는 반드시 아래 APP_PY 문자열 안에만 존재해야 합니다.
+      const APP_PY = String.raw`
 import streamlit as st
 import json
 import sys
@@ -80,7 +111,7 @@ else:
         chapter_data = load_json(os.path.join("data", selected_file))
         
         if not chapter_data:
-             st.error(f"{selected_file} 파일을 읽을 수 없습니다.")
+            st.error(f"{selected_file} 파일을 읽을 수 없습니다.")
         else:
             # 2. 소단원(챕터) 선택
             chapter_titles = [item['sub_title'] for item in chapter_data]
@@ -142,8 +173,8 @@ else:
                         
                         # 오른쪽 컬럼(결과창) 안내 문구 (실행 전)
                         with col2:
-                            if f"btn_{unique_key}" not in st.session_state or not st.session_state[f"btn_{unique_key}"]:
-                                st.caption("👈 실행 버튼을 누르면 결과가 여기에 표시됩니다.")
+                            # 버튼 상태 체크가 애매할 수 있어 "항상 안내"로 처리해도 무방합니다.
+                            st.caption("👈 실행 버튼을 누르면 결과가 여기에 표시됩니다.")
 
                     # 3) 비디오 블록
                     elif b_type == 'video':
@@ -158,21 +189,24 @@ else:
                     # 블록 간 간격 추가
                     st.write("") 
                     st.write("") 
-`,
-          "data/menu.json": {
-            url: "./data/menu.json",
-          },
-          "data/01_python.json": {
-            url: "./data/01_python.json",
-          },
-          "data/02_data.json": {
-            url: "./data/02_data.json",
-          },
-          "data/03_ai.json": {
-            url: "./data/03_ai.json",
+`;
+
+      // stlite 마운트
+      stlite.mount(
+        {
+          // iOS에서는 무거운 패키지 로딩을 피해서 우선 안정화
+          requirements: isIOS ? [] : ["pandas", "matplotlib", "numpy"],
+          entrypoint: "app.py",
+          files: {
+            "app.py": APP_PY,
+            "data/menu.json": { url: "./data/menu.json" },
+            "data/01_python.json": { url: "./data/01_python.json" },
+            "data/02_data.json": { url: "./data/02_data.json" },
+            "data/03_ai.json": { url: "./data/03_ai.json" }
           }
         },
-      }, document.getElementById("root"));
+        document.getElementById("root")
+      );
     </script>
   </body>
 </html>
