@@ -4,19 +4,134 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>정보 수업 파이썬 실습실 테스트1</title>
-    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.31.0/build/stlite.js"></script>
+    <title>정보 수업 파이썬 실습실</title>
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.53.0/build/stlite.js"></script>
   </head>
   <body>
     <div id="root"></div>
     <script>
       stlite.mount({
-        requirements: ["pandas", "matplotlib", "numpy"], // 필요한 라이브러리 명시
-        entrypoint: "app.py", // 시작 파일
+        requirements: ["pandas", "matplotlib", "numpy"], 
+        entrypoint: "app.py", 
         files: {
-          "app.py": {
-            url: "./app.py", // 같은 폴더의 app.py 로드
-          },
+          /* [중요] app.py 파일을 별도로 로딩하지 않고 여기에 직접 적습니다.
+             이렇게 하면 파일 경로 에러가 발생하지 않습니다.
+          */
+          "app.py": `
+import streamlit as st
+import json
+import sys
+from io import StringIO
+import os
+
+st.set_page_config(layout="wide", page_title="정보 수업 파이썬 실습")
+
+# 스타일링
+st.markdown("""
+<style>
+    .stTextArea textarea {
+        background-color: #f0f2f6;
+        font-family: 'Courier New', Courier, monospace;
+        line-height: 1.5;
+    }
+    .output-box {
+        background-color: #262730;
+        color: #ffffff;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: 'Courier New', monospace;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# 데이터 로드 함수 (실패 시 에러 메시지 출력)
+def load_json(filepath):
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        return []
+
+# 사이드바 구성
+st.sidebar.title("🐍 정보 수업 실습실")
+st.sidebar.header("학습 주제 선택")
+
+# 메뉴 데이터 불러오기 시도
+try:
+    menu_data = load_json("data/menu.json")
+except:
+    menu_data = []
+
+if not menu_data:
+    st.sidebar.error("메뉴 파일(data/menu.json)을 찾을 수 없습니다.")
+    st.sidebar.info("GitHub 저장소의 data 폴더를 확인해주세요.")
+else:
+    menu_options = {item['title']: item for item in menu_data}
+    selected_main_title = st.sidebar.selectbox("대단원 선택", list(menu_options.keys()))
+
+    if selected_main_title:
+        selected_file = menu_options[selected_main_title]['file']
+        # 선택된 파일 로드
+        chapter_data = load_json(os.path.join("data", selected_file))
+        
+        if not chapter_data:
+             st.error(f"{selected_file} 파일을 읽을 수 없습니다.")
+        else:
+            # 챕터 선택
+            chapter_titles = [item['sub_title'] for item in chapter_data]
+            selected_chapter_title = st.sidebar.selectbox("학습 내용 선택", chapter_titles)
+            
+            current_chapter = next((item for item in chapter_data if item['sub_title'] == selected_chapter_title), None)
+
+            if current_chapter:
+                st.header(f"📝 {current_chapter['sub_title']}")
+                
+                # 콘텐츠 타입에 따른 분기 처리
+                c_type = current_chapter.get('type', 'code') # 기본값은 code
+
+                if c_type == 'theory':
+                    st.markdown(current_chapter['content'])
+                
+                elif c_type == 'video':
+                    st.markdown(current_chapter.get('content', ''))
+                    st.video(current_chapter['url'])
+                
+                else: # code 타입
+                    st.info(current_chapter['content'])
+                    st.divider()
+                    col1, col2 = st.columns([1, 1])
+                    
+                    with col1:
+                        st.subheader("💻 코드 작성")
+                        user_code = st.text_area(
+                            "Code Editor", 
+                            value=current_chapter.get('default_code', ''),
+                            height=300,
+                            key=f"editor_{selected_chapter_title}",
+                            label_visibility="collapsed"
+                        )
+                        run_button = st.button("▶️ 실행하기", type="primary")
+
+                    with col2:
+                        st.subheader("결과 확인")
+                        if run_button:
+                            old_stdout = sys.stdout
+                            redirected_output = StringIO()
+                            sys.stdout = redirected_output
+                            try:
+                                exec(user_code)
+                                output = redirected_output.getvalue()
+                                if output:
+                                    st.markdown(f"<div class='output-box'>{output.replace(chr(10), '<br>')}</div>", unsafe_allow_html=True)
+                                else:
+                                    st.warning("출력 결과가 없습니다.")
+                            except Exception as e:
+                                st.error(f"에러 발생:\\n{e}")
+                            finally:
+                                sys.stdout = old_stdout
+`,
+          /* JSON 파일들은 여전히 불러와야 합니다. 
+             경로가 정확한지 꼭 확인해주세요 (대소문자 구분) */
           "data/menu.json": {
             url: "./data/menu.json",
           },
