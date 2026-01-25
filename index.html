@@ -14,9 +14,6 @@
         requirements: ["pandas", "matplotlib", "numpy"], 
         entrypoint: "app.py", 
         files: {
-          /* [중요] app.py 파일을 별도로 로딩하지 않고 여기에 직접 적습니다.
-             이렇게 하면 파일 경로 에러가 발생하지 않습니다.
-          */
           "app.py": `
 import streamlit as st
 import json
@@ -26,7 +23,7 @@ import os
 
 st.set_page_config(layout="wide", page_title="정보 수업 파이썬 실습")
 
-# 스타일링
+# --- CSS 스타일링 ---
 st.markdown("""
 <style>
     .stTextArea textarea {
@@ -40,98 +37,119 @@ st.markdown("""
         padding: 10px;
         border-radius: 5px;
         font-family: 'Courier New', monospace;
+        margin-top: 10px;
+    }
+    .block-container {
+        padding-top: 2rem;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# 데이터 로드 함수 (실패 시 에러 메시지 출력)
+# --- 데이터 로드 함수 ---
 def load_json(filepath):
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             return json.load(f)
-    except Exception as e:
+    except Exception:
         return []
 
-# 사이드바 구성
+# --- 사이드바 (메뉴) ---
 st.sidebar.title("🐍 정보 수업 실습실")
 st.sidebar.header("학습 주제 선택")
 
-# 메뉴 데이터 불러오기 시도
-try:
-    menu_data = load_json("data/menu.json")
-except:
-    menu_data = []
+menu_data = load_json("data/menu.json")
 
 if not menu_data:
-    st.sidebar.error("메뉴 파일(data/menu.json)을 찾을 수 없습니다.")
-    st.sidebar.info("GitHub 저장소의 data 폴더를 확인해주세요.")
+    st.sidebar.error("메뉴 데이터(data/menu.json)가 없습니다.")
 else:
+    # 1. 대단원 선택
     menu_options = {item['title']: item for item in menu_data}
     selected_main_title = st.sidebar.selectbox("대단원 선택", list(menu_options.keys()))
 
     if selected_main_title:
         selected_file = menu_options[selected_main_title]['file']
-        # 선택된 파일 로드
         chapter_data = load_json(os.path.join("data", selected_file))
         
         if not chapter_data:
              st.error(f"{selected_file} 파일을 읽을 수 없습니다.")
         else:
-            # 챕터 선택
+            # 2. 소단원(챕터) 선택
             chapter_titles = [item['sub_title'] for item in chapter_data]
             selected_chapter_title = st.sidebar.selectbox("학습 내용 선택", chapter_titles)
             
+            # 현재 선택된 챕터 데이터 가져오기
             current_chapter = next((item for item in chapter_data if item['sub_title'] == selected_chapter_title), None)
 
+            # --- 메인 화면 렌더링 (블록 조립 방식) ---
             if current_chapter:
                 st.header(f"📝 {current_chapter['sub_title']}")
-                
-                # 콘텐츠 타입에 따른 분기 처리
-                c_type = current_chapter.get('type', 'code') # 기본값은 code
+                st.divider()
 
-                if c_type == 'theory':
-                    st.markdown(current_chapter['content'])
-                
-                elif c_type == 'video':
-                    st.markdown(current_chapter.get('content', ''))
-                    st.video(current_chapter['url'])
-                
-                else: # code 타입
-                    st.info(current_chapter['content'])
-                    st.divider()
-                    col1, col2 = st.columns([1, 1])
+                # 'blocks' 리스트가 있는지 확인 (없으면 구버전 호환 또는 빈화면)
+                blocks = current_chapter.get('blocks', [])
+
+                # 블록 하나씩 순서대로 그리기
+                for index, block in enumerate(blocks):
+                    b_type = block.get('type', 'text')
                     
-                    with col1:
-                        st.subheader("💻 코드 작성")
-                        user_code = st.text_area(
-                            "Code Editor", 
-                            value=current_chapter.get('default_code', ''),
-                            height=300,
-                            key=f"editor_{selected_chapter_title}",
-                            label_visibility="collapsed"
-                        )
-                        run_button = st.button("▶️ 실행하기", type="primary")
+                    # 1) 텍스트(Markdown) 블록
+                    if b_type == 'text':
+                        st.markdown(block.get('content', ''))
 
-                    with col2:
-                        st.subheader("결과 확인")
-                        if run_button:
-                            old_stdout = sys.stdout
-                            redirected_output = StringIO()
-                            sys.stdout = redirected_output
-                            try:
-                                exec(user_code)
-                                output = redirected_output.getvalue()
-                                if output:
-                                    st.markdown(f"<div class='output-box'>{output.replace(chr(10), '<br>')}</div>", unsafe_allow_html=True)
-                                else:
-                                    st.warning("출력 결과가 없습니다.")
-                            except Exception as e:
-                                st.error(f"에러 발생:\\n{e}")
-                            finally:
-                                sys.stdout = old_stdout
+                    # 2) 코드 에디터 블록
+                    elif b_type == 'code':
+                        st.info(block.get('guide', '아래 코드를 실행해보세요.')) # 가이드 문구
+                        
+                        col1, col2 = st.columns([1, 1])
+                        
+                        # 중요: 위젯마다 고유한 key가 필요하므로 index를 활용함
+                        unique_key = f"editor_{selected_chapter_title}_{index}"
+                        
+                        with col1:
+                            user_code = st.text_area(
+                                "Code", 
+                                value=block.get('content', ''),
+                                height=200,
+                                key=unique_key,
+                                label_visibility="collapsed"
+                            )
+                            # 실행 버튼
+                            if st.button("▶️ 실행하기", key=f"btn_{unique_key}", type="primary"):
+                                with col2:
+                                    old_stdout = sys.stdout
+                                    redirected_output = StringIO()
+                                    sys.stdout = redirected_output
+                                    try:
+                                        exec(user_code)
+                                        output = redirected_output.getvalue()
+                                        if output:
+                                            st.markdown(f"<div class='output-box'>{output.replace(chr(10), '<br>')}</div>", unsafe_allow_html=True)
+                                        else:
+                                            st.warning("출력 결과가 없습니다.")
+                                    except Exception as e:
+                                        st.error(f"에러 발생:\\n{e}")
+                                    finally:
+                                        sys.stdout = old_stdout
+                        
+                        # 오른쪽 컬럼(결과창) 안내 문구 (실행 전)
+                        with col2:
+                            if f"btn_{unique_key}" not in st.session_state or not st.session_state[f"btn_{unique_key}"]:
+                                st.caption("👈 실행 버튼을 누르면 결과가 여기에 표시됩니다.")
+
+                    # 3) 비디오 블록
+                    elif b_type == 'video':
+                        st.video(block.get('url'))
+                        if 'caption' in block:
+                            st.caption(block['caption'])
+
+                    # 4) 이미지 블록
+                    elif b_type == 'image':
+                        st.image(block.get('url'), caption=block.get('caption', ''))
+                    
+                    # 블록 간 간격 추가
+                    st.write("") 
+                    st.write("") 
 `,
-          /* JSON 파일들은 여전히 불러와야 합니다. 
-             경로가 정확한지 꼭 확인해주세요 (대소문자 구분) */
           "data/menu.json": {
             url: "./data/menu.json",
           },
