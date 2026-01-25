@@ -1,0 +1,200 @@
+#정답 유무 기능 추가전 코드
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>경문고등학교 파이썬 실습실</title>
+
+    <!-- ✅ 버전 고정 권장 (예시: 0.85.1) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css"
+    />
+
+    <style>
+      #error-log {
+        display: none;
+        background: #ffcccc;
+        color: #cc0000;
+        padding: 10px;
+        border: 2px solid red;
+        margin: 10px;
+        white-space: pre-wrap;
+        font-family: monospace;
+        font-size: 12px;
+        z-index: 9999;
+        position: relative;
+      }
+    </style>
+    <script>
+      window.onerror = function (message, source, lineno) {
+        var log = document.getElementById("error-log");
+        if (log) {
+          log.style.display = "block";
+          log.textContent +=
+            "Error: " + message + "\nLine: " + lineno + "\nSource: " + source + "\n\n";
+        }
+      };
+      window.onunhandledrejection = function (event) {
+        var log = document.getElementById("error-log");
+        if (log) {
+          log.style.display = "block";
+          log.textContent += "Promise Error: " + event.reason + "\n\n";
+        }
+      };
+    </script>
+  </head>
+
+  <body>
+    <div id="error-log"></div>
+    <div id="root"></div>
+
+    <!-- ✅ 핵심: stlite는 전역변수가 아니라 ESM import로 mount를 가져와야 함 -->
+    <script type="module">
+      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js";
+
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+      const APP_PY = String.raw`
+import streamlit as st
+import json
+import sys
+from io import StringIO
+import os
+
+st.set_page_config(layout="wide", page_title="정보 수업 파이썬 실습")
+
+st.markdown("""
+<style>
+    .stTextArea textarea {
+        background-color: #f0f2f6;
+        font-family: 'Courier New', Courier, monospace;
+        line-height: 1.5;
+    }
+    .output-box {
+        background-color: #262730;
+        color: #ffffff;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: 'Courier New', monospace;
+        margin-top: 10px;
+    }
+    .block-container { padding-top: 2rem; }
+</style>
+""", unsafe_allow_html=True)
+
+def load_json(filepath):
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+st.sidebar.title("🐍 경문고등학교 수업 실습실")
+st.sidebar.header("학습 주제 선택")
+
+menu_data = load_json("data/menu.json")
+
+if not menu_data:
+    st.sidebar.error("메뉴 데이터(data/menu.json)가 없습니다.")
+else:
+    menu_options = {item['title']: item for item in menu_data}
+    selected_main_title = st.sidebar.selectbox("대단원 선택", list(menu_options.keys()))
+
+    if selected_main_title:
+        selected_file = menu_options[selected_main_title]['file']
+        chapter_data = load_json(os.path.join("data", selected_file))
+
+        if not chapter_data:
+            st.error(f"{selected_file} 파일을 읽을 수 없습니다.")
+        else:
+            chapter_titles = [item['sub_title'] for item in chapter_data]
+            selected_chapter_title = st.sidebar.selectbox("학습 내용 선택", chapter_titles)
+
+            current_chapter = next((item for item in chapter_data if item['sub_title'] == selected_chapter_title), None)
+
+            if current_chapter:
+                st.header(f"📝 {current_chapter['sub_title']}")
+                st.divider()
+
+                blocks = current_chapter.get('blocks', [])
+
+                for index, block in enumerate(blocks):
+                    b_type = block.get('type', 'text')
+
+                    if b_type == 'text':
+                        st.markdown(block.get('content', ''))
+
+                    elif b_type == 'code':
+                        st.info(block.get('guide', '아래 코드를 실행해보세요.'))
+                        col1, col2 = st.columns([1, 1])
+
+                        unique_key = f"editor_{selected_chapter_title}_{index}"
+
+                        with col1:
+                            user_code = st.text_area(
+                                "Code",
+                                value=block.get('content', ''),
+                                height=200,
+                                key=unique_key,
+                                label_visibility="collapsed"
+                            )
+                            if st.button("▶️ 실행하기", key=f"btn_{unique_key}", type="primary"):
+                                with col2:
+                                    old_stdout = sys.stdout
+                                    redirected_output = StringIO()
+                                    sys.stdout = redirected_output
+                                    try:
+                                        exec(user_code)
+                                        output = redirected_output.getvalue()
+                                        if output:
+                                            st.markdown(
+                                                f"<div class='output-box'>{output.replace(chr(10), '<br>')}</div>",
+                                                unsafe_allow_html=True
+                                            )
+                                        else:
+                                            st.warning("출력 결과가 없습니다.")
+                                    except Exception as e:
+                                        st.error(f"에러 발생:\\n{e}")
+                                    finally:
+                                        sys.stdout = old_stdout
+
+                        with col2:
+                            st.caption("👈 실행 버튼을 누르면 결과가 여기에 표시됩니다.")
+
+                    elif b_type == 'video':
+                        st.video(block.get('url'))
+                        if 'caption' in block:
+                            st.caption(block['caption'])
+
+                    elif b_type == 'image':
+                        st.image(block.get('url'), caption=block.get('caption', ''))
+
+                    st.write("")
+                    st.write("")
+`;
+
+      mount(
+        {
+          // iOS에서는 우선 가볍게(필요한 단원에서만 패키지 추가 권장)
+          requirements:["pandas", "matplotlib", "numpy"],
+          /*원본코드requirements: isIOS ? [] : ["pandas", "matplotlib", "numpy"],*/
+          
+          entrypoint: "app.py",
+          files: {
+            "app.py": APP_PY,
+            "data/menu.json": { url: "./data/menu.json" },
+            "data/01_python.json": { url: "./data/01_python.json" },
+            "data/02_data.json": { url: "./data/02_data.json" },
+            "data/03_ai.json": { url: "./data/03_ai.json" }
+          }
+        },
+        document.getElementById("root")
+      );
+    </script>
+  </body>
+</html>
