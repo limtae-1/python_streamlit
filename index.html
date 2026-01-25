@@ -180,7 +180,7 @@ else:
       mount(
         {
           // iOS에서는 우선 가볍게(필요한 단원에서만 패키지 추가 권장)
-          requirements: isIOS ? [] : ["pandas", "matplotlib", "numpy"],
+          requirements:["pandas", "matplotlib", "numpy"],
           entrypoint: "app.py",
           files: {
             "app.py": APP_PY,
