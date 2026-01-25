@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>정보 수업 파이썬 실습실</title>
+    <title>경문고등학교 파이썬 실습실</title>
 
     <!-- ✅ 버전 고정 권장 (예시: 0.85.1) -->
     <link
@@ -93,7 +93,7 @@ def load_json(filepath):
     except Exception:
         return []
 
-st.sidebar.title("🐍 정보 수업 실습실")
+st.sidebar.title("🐍 경문고등학교 수업 실습실")
 st.sidebar.header("학습 주제 선택")
 
 menu_data = load_json("data/menu.json")
@@ -181,6 +181,8 @@ else:
         {
           // iOS에서는 우선 가볍게(필요한 단원에서만 패키지 추가 권장)
           requirements:["pandas", "matplotlib", "numpy"],
+          /*원본코드requirements: isIOS ? [] : ["pandas", "matplotlib", "numpy"],*/
+          
           entrypoint: "app.py",
           files: {
             "app.py": APP_PY,
