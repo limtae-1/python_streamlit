@@ -63,7 +63,14 @@
                 "type": "code",
                 "guide": "문제 2. 변수 b에 자신의 이름을 문자열로 넣고 출력하세요.",
                 "content": "b = '홍길동'\nprint(b)"
+            },
+          
+            {
+                "type": "code_input",
+                "guide": "문제 3. 테스트 입니다.",
+                "content": "b = input()\nprint(b)"
             }
+          
         ]
     }
 ]
