@@ -266,9 +266,16 @@ else:
 
                     # ✅ key_base: 타입 + 챕터 + 인덱스로 충돌 방지
                     key_base = f"{b_type}_{chapter_id}_{index}"
-
+                    #아래는 초기 텍스트 파일 상자
+                    #if b_type == 'text':
+                    #    st.markdown(block.get('content', ''))
+                    
+                    #아래는 줄바꿈 lines를 추가한 기능
                     if b_type == 'text':
-                        st.markdown(block.get('content', ''))
+                        if 'lines' in block:
+                            st.markdown("\n".join(block.get('lines', [])))
+                        else:
+                            st.markdown(block.get('content', ''))
 
                     # 입력 없음 / 채점 없음
                     elif b_type == 'code':
