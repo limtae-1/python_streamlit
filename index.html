@@ -165,12 +165,43 @@ else:
 
                 for index, block in enumerate(blocks):
                     b_type = block.get('type', 'text')
-
+#===============================콘텐츠 구성 구분선===============================
                     if b_type == 'text':
                         st.markdown(block.get('content', ''))
 
-                    # ✅ 일반 코드 블록: 코드 → 입력칸 → 실행 → 결과
+#===============================콘텐츠 구성 구분선===============================
+
+                    # ✅ 일반 코드 블록: 코드 → 실행 → 결과
                     elif b_type == 'code':
+                        st.info(block.get('guide', '아래 코드를 실행해보세요.'))
+
+                        key_base = f"code_{selected_chapter_title}_{index}"
+
+                        user_code = st.text_area(
+                            "Code",
+                            value=block.get('content', ''),
+                            height=170,
+                            key=f"ta_{key_base}",
+                            label_visibility="collapsed"
+                        )
+
+                        if st.button("▶️ 실행", key=f"run_{key_base}", type="primary"):
+                            st.session_state[f"res_{key_base}"] = run_user_code(user_code, stdin_text)
+
+                        res = st.session_state.get(f"res_{key_base}")
+                        if res:
+                            st.markdown("**실행결과**")
+                            if res["ok"]:
+                                render_output_box(res["output"])
+                            else:
+                                st.error(f"에러: {res['error']}")
+                                if res["output"]:
+                                    render_output_box(res["output"])
+
+#===============================콘텐츠 구성 구분선===============================
+                                    
+                    # ✅ 일반 코드 블록: 코드 → 입력칸 → 실행 → 결과
+                    elif b_type == 'code_input':
                         st.info(block.get('guide', '아래 코드를 실행해보세요.'))
 
                         key_base = f"code_{selected_chapter_title}_{index}"
@@ -204,8 +235,65 @@ else:
                                 if res["output"]:
                                     render_output_box(res["output"])
 
-                    # ✅ 연습문제: 코드 → 입력칸 → 실행 → 결과 → 정답/오답
+#===============================콘텐츠 구성 구분선===============================
+                                    
+                    # ✅ 연습문제: 코드 → 실행 → 결과 → 정답/오답
                     elif b_type == 'exercise_code':
+                        title = block.get("title", "<연습해보기>")
+                        prompt = block.get("prompt", "")
+                        starter = block.get("starter", "")
+                        expected = block.get("expected_output", "")
+                        answer = block.get("answer", "")
+
+                        st.markdown(f"### {title}")
+                        st.markdown(prompt)
+
+                        key_base = f"ex_{selected_chapter_title}_{index}"
+
+                        user_code = st.text_area(
+                            "Code",
+                            value=starter,
+                            height=170,
+                            key=f"ta_{key_base}",
+                            label_visibility="collapsed"
+                        )
+
+                        if st.button("▶️ 실행", key=f"run_{key_base}", type="primary"):
+                            res = run_user_code(user_code, stdin_text)
+                            st.session_state[f"res_{key_base}"] = res
+
+                            if res["ok"]:
+                                user_out = normalize_output(res["output"])
+                                exp_out = normalize_output(expected)
+                                st.session_state[f"grade_{key_base}"] = (user_out == exp_out)
+                            else:
+                                st.session_state[f"grade_{key_base}"] = False
+
+                        res = st.session_state.get(f"res_{key_base}")
+                        if res:
+                            st.markdown("**실행결과**")
+                            if res["ok"]:
+                                render_output_box(res["output"])
+                            else:
+                                st.error(f"에러: {res['error']}")
+                                if res["output"]:
+                                    render_output_box(res["output"])
+
+                            st.markdown("**채점결과**")
+                            is_correct = st.session_state.get(f"grade_{key_base}")
+                            if is_correct is True:
+                                st.success("✅ 정답입니다!")
+                            else:
+                                st.error("❌ 오답입니다.")
+                                st.caption(f"기대 출력: {expected}")
+
+                        with st.expander("정답"):
+                            st.code(answer, language="python")
+
+#===============================콘텐츠 구성 구분선===============================
+
+                    # ✅ 연습문제: 코드 → 입력칸 → 실행 → 결과 → 정답/오답
+                    elif b_type == 'exercise_code_input':
                         title = block.get("title", "<연습해보기>")
                         prompt = block.get("prompt", "")
                         starter = block.get("starter", "")
@@ -265,10 +353,14 @@ else:
                         with st.expander("정답"):
                             st.code(answer, language="python")
 
+#===============================콘텐츠 구성 구분선===============================
+
                     elif b_type == 'video':
                         st.video(block.get('url'))
                         if 'caption' in block:
                             st.caption(block['caption'])
+
+#===============================콘텐츠 구성 구분선===============================
 
                     elif b_type == 'image':
                         st.image(block.get('url'), caption=block.get('caption', ''))
