@@ -1,13 +1,43 @@
 [
   {
-    "sub_title": "01. 인공지능 역사",
+    "sub_title": "01.인공지능 역사",
     "blocks": [
       {
         "type": "text",
         "lines": [
                   "튜링테스트",
-                  "인공신경망의 시작"
+                  "최초의 인공신경망 퍼셉트론",
                   ]
+      },
+
+      {
+        "type": "text",
+        "content": "### <print()명령어 예시문1>"
+      },
+      {
+        "type": "code",
+        "guide": "아래 코드를 실행해보세요.",
+        "content": "print(\"Hello\")"
+      },
+
+      {
+        "type": "text",
+        "content": "### <print()명령어 예시문2>"
+      },
+      {
+        "type": "code",
+        "guide": "아래 코드를 실행해보세요.",
+        "content": "print(94)"
+      },
+
+      {
+        "type": "exercise_code",
+        "title": "<연습해보기>",
+        "prompt": "화면에 **'kyungmoon'**을 출력하는 프로그램을 작성하시오.\n\n단, **(작은따옴표)는 출력하지 않아도 된다.**",
+        "starter": "print()  # 여기에 작성",
+        "expected_output": "kyungmoon",
+        "answer": "print(\"kyungmoon\")"
       }
-  ]
+    ]
+  }
 ]
