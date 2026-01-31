@@ -1,46 +1,95 @@
 [
   {
-    "sub_title": "데이터 분석 기초 시작",
+    "sub_title": "01. 데이터 준비",
     "blocks": [
       {
         "type": "text",
-        "lines": [
-                  "## 출력명령어 print()",
-                  "- Python언어에서 화면에 출력을 하는 명령어는 **print()** 명령어이다.",
-                  "- **print()명령어를 통해 문자, 데이터 등 다양한 자료를 화면에 출력**할 수 있다.",
-                  "- print()명령어를 통해 **문자를 출력**하기 위해서는 출력하고자 하는 문자를 **(큰/작은)따옴표로 감싸**야 한다.",
-                  "- **숫자를 출력**하기 위해선 (큰/작은)따옴표를 할 필요가 없다."
-                  ]
-      },
-
-      {
-        "type": "text",
-        "content": "### <print()명령어 예시문1>"
-      },
-      {
-        "type": "code",
-        "guide": "아래 코드를 실행해보세요.",
-        "content": "print(\"Hello\")"
-      },
-
-      {
-        "type": "text",
-        "content": "### <print()명령어 예시문2>"
-      },
-      {
-        "type": "code",
-        "guide": "아래 코드를 실행해보세요.",
-        "content": "print(94)"
-      },
-
-      {
-        "type": "exercise_code",
-        "title": "<연습해보기>",
-        "prompt": "화면에 **'kyungmoon'**을 출력하는 프로그램을 작성하시오.\n\n단, **(작은따옴표)는 출력하지 않아도 된다.**",
-        "starter": "print()  # 여기에 작성",
-        "expected_output": "kyungmoon",
-        "answer": "print(\"kyungmoon\")"
+        "content": "## 데이터 분석 실습 안내\n- 아래 실습들은 **그래프(시각화)** 를 화면에 띄우고, 동시에 **정답 채점용 출력(print)** 을 합니다.\n- 채점은 **print 결과가 expected_output과 완전히 같아야** 정답 처리됩니다.\n  - 즉, 다른 print가 있으면 오답 처리될 수 있어요.\n\n---\n### 공통 데이터셋\n- 학생 20명의 학습/수면/휴대폰 사용 시간과 점수 데이터입니다.\n- 모든 실습은 동일 데이터로 진행합니다."
       }
     ]
-  }
-]
+  },
+  {
+    "sub_title": "02. 막대그래프",
+    "blocks": [
+      {
+        "type": "text",
+        "content": "## 막대그래프(bar chart)\n- 동아리별 학생 수를 세어 막대그래프로 나타냅니다.\n- 채점: **AI 동아리 학생 수**를 print로 출력하세요."
+      },
+      {
+        "type": "exercise_code",
+        "title": "<실습 1> 동아리별 학생 수 막대그래프",
+        "prompt": "1) 동아리별 학생 수를 세어 **막대그래프**로 나타내시오.\n2) 채점용 출력: **AI 동아리 학생 수**를 `print()`로 출력하시오.\n\n⚠️ 채점을 위해 다른 print는 하지 마세요.",
+        "guide": "TODO 부분을 완성한 뒤 실행하세요.",
+        "starter": "import streamlit as st\nimport pandas as pd\nfrom io import StringIO\n\ncsv_text = \"\"\"student,grade,club,study_hours,sleep_hours,phone_hours,math_score,eng_score\nS01,1,AI,2.0,7.5,3.5,68,72\nS02,1,Music,1.5,6.8,4.2,62,75\nS03,1,Sports,3.0,7.0,2.8,74,69\nS04,1,AI,4.0,6.5,3.9,81,78\nS05,1,Art,2.5,7.8,3.0,70,80\nS06,2,AI,3.5,6.9,3.6,79,74\nS07,2,Music,2.0,7.2,3.2,71,77\nS08,2,Sports,4.5,6.4,4.5,85,70\nS09,2,AI,5.0,6.1,4.8,90,73\nS10,2,Art,1.0,8.0,2.1,60,82\nS11,2,AI,2.8,7.4,2.9,73,79\nS12,3,AI,4.2,6.0,5.1,88,71\nS13,3,Music,3.0,6.6,4.0,76,76\nS14,3,Sports,5.5,5.8,5.6,92,68\nS15,3,Art,2.2,7.9,2.5,69,84\nS16,3,AI,3.8,6.3,4.4,82,75\nS17,3,AI,1.7,7.6,3.3,64,81\nS18,1,AI,2.6,7.1,3.1,72,74\nS19,2,Sports,3.9,6.7,4.1,80,72\nS20,1,Music,2.1,7.3,3.0,67,78\n\"\"\"\n\ndf = pd.read_csv(StringIO(csv_text))\n\n# TODO: 동아리별 학생 수를 세어보세요\nclub_counts = None\n\nst.subheader(\"동아리별 학생 수\")\n# 시각화(막대그래프)\nst.bar_chart(club_counts)\n\n# 채점용 출력: AI 동아리 학생 수\nprint(int(club_counts[\"AI\"]))\n",
+        "expected_output": "9",
+        "answer": "import streamlit as st\nimport pandas as pd\nfrom io import StringIO\n\ncsv_text = \"\"\"student,grade,club,study_hours,sleep_hours,phone_hours,math_score,eng_score\nS01,1,AI,2.0,7.5,3.5,68,72\nS02,1,Music,1.5,6.8,4.2,62,75\nS03,1,Sports,3.0,7.0,2.8,74,69\nS04,1,AI,4.0,6.5,3.9,81,78\nS05,1,Art,2.5,7.8,3.0,70,80\nS06,2,AI,3.5,6.9,3.6,79,74\nS07,2,Music,2.0,7.2,3.2,71,77\nS08,2,Sports,4.5,6.4,4.5,85,70\nS09,2,AI,5.0,6.1,4.8,90,73\nS10,2,Art,1.0,8.0,2.1,60,82\nS11,2,AI,2.8,7.4,2.9,73,79\nS12,3,AI,4.2,6.0,5.1,88,71\nS13,3,Music,3.0,6.6,4.0,76,76\nS14,3,Sports,5.5,5.8,5.6,92,68\nS15,3,Art,2.2,7.9,2.5,69,84\nS16,3,AI,3.8,6.3,4.4,82,75\nS17,3,AI,1.7,7.6,3.3,64,81\nS18,1,AI,2.6,7.1,3.1,72,74\nS19,2,Sports,3.9,6.7,4.1,80,72\nS20,1,Music,2.1,7.3,3.0,67,78\n\"\"\"\n\ndf = pd.read_csv(StringIO(csv_text))\nclub_counts = df[\"club\"].value_counts()\n\nst.subheader(\"동아리별 학생 수\")\nst.bar_chart(club_counts)\n\nprint(int(club_counts[\"AI\"]))"
+      }
+    ]
+  },
+  {
+    "sub_title": "03. 선그래프",
+    "blocks": [
+      {
+        "type": "text",
+        "content": "## 선그래프(line chart)\n- 학년(1~3)별 평균 수학 점수를 구해 선그래프로 나타냅니다.\n- 채점: 평균 수학 점수가 가장 높은 **학년 번호**를 print로 출력하세요."
+      },
+      {
+        "type": "exercise_code",
+        "title": "<실습 2> 학년별 평균 수학 점수 선그래프",
+        "prompt": "1) 학년별 평균 수학 점수를 구해 **선그래프**로 나타내시오.\n2) 채점용 출력: 평균 수학 점수가 가장 높은 **학년 번호(1~3)** 를 `print()`로 출력하시오.\n\n⚠️ 채점을 위해 다른 print는 하지 마세요.",
+        "guide": "groupby로 평균을 구한 뒤 line_chart로 시각화하세요.",
+        "starter": "import streamlit as st\nimport pandas as pd\nfrom io import StringIO\n\ncsv_text = \"\"\"student,grade,club,study_hours,sleep_hours,phone_hours,math_score,eng_score\nS01,1,AI,2.0,7.5,3.5,68,72\nS02,1,Music,1.5,6.8,4.2,62,75\nS03,1,Sports,3.0,7.0,2.8,74,69\nS04,1,AI,4.0,6.5,3.9,81,78\nS05,1,Art,2.5,7.8,3.0,70,80\nS06,2,AI,3.5,6.9,3.6,79,74\nS07,2,Music,2.0,7.2,3.2,71,77\nS08,2,Sports,4.5,6.4,4.5,85,70\nS09,2,AI,5.0,6.1,4.8,90,73\nS10,2,Art,1.0,8.0,2.1,60,82\nS11,2,AI,2.8,7.4,2.9,73,79\nS12,3,AI,4.2,6.0,5.1,88,71\nS13,3,Music,3.0,6.6,4.0,76,76\nS14,3,Sports,5.5,5.8,5.6,92,68\nS15,3,Art,2.2,7.9,2.5,69,84\nS16,3,AI,3.8,6.3,4.4,82,75\nS17,3,AI,1.7,7.6,3.3,64,81\nS18,1,AI,2.6,7.1,3.1,72,74\nS19,2,Sports,3.9,6.7,4.1,80,72\nS20,1,Music,2.1,7.3,3.0,67,78\n\"\"\"\n\ndf = pd.read_csv(StringIO(csv_text))\n\n# TODO: 학년별 평균 수학 점수(Series)를 만드세요\navg_math = None\n\nst.subheader(\"학년별 평균 수학 점수\")\nst.line_chart(avg_math)\n\n# 채점용 출력: 평균 수학 점수가 가장 높은 학년 번호\nprint(int(avg_math.idxmax()))\n",
+        "expected_output": "3",
+        "answer": "import streamlit as st\nimport pandas as pd\nfrom io import StringIO\n\ncsv_text = \"\"\"student,grade,club,study_hours,sleep_hours,phone_hours,math_score,eng_score\nS01,1,AI,2.0,7.5,3.5,68,72\nS02,1,Music,1.5,6.8,4.2,62,75\nS03,1,Sports,3.0,7.0,2.8,74,69\nS04,1,AI,4.0,6.5,3.9,81,78\nS05,1,Art,2.5,7.8,3.0,70,80\nS06,2,AI,3.5,6.9,3.6,79,74\nS07,2,Music,2.0,7.2,3.2,71,77\nS08,2,Sports,4.5,6.4,4.5,85,70\nS09,2,AI,5.0,6.1,4.8,90,73\nS10,2,Art,1.0,8.0,2.1,60,82\nS11,2,AI,2.8,7.4,2.9,73,79\nS12,3,AI,4.2,6.0,5.1,88,71\nS13,3,Music,3.0,6.6,4.0,76,76\nS14,3,Sports,5.5,5.8,5.6,92,68\nS15,3,Art,2.2,7.9,2.5,69,84\nS16,3,AI,3.8,6.3,4.4,82,75\nS17,3,AI,1.7,7.6,3.3,64,81\nS18,1,AI,2.6,7.1,3.1,72,74\nS19,2,Sports,3.9,6.7,4.1,80,72\nS20,1,Music,2.1,7.3,3.0,67,78\n\"\"\"\n\ndf = pd.read_csv(StringIO(csv_text))\navg_math = df.groupby('grade')['math_score'].mean()\n\nst.subheader('학년별 평균 수학 점수')\nst.line_chart(avg_math)\n\nprint(int(avg_math.idxmax()))"
+      }
+    ]
+  },
+  {
+    "sub_title": "04. 히스토그램",
+    "blocks": [
+      {
+        "type": "text",
+        "content": "## 히스토그램(histogram)\n- 학습 시간(study_hours)의 분포를 히스토그램으로 확인합니다.\n- 채점: 학습 시간 평균을 **소수 첫째 자리까지 반올림**하여 print로 출력하세요."
+      },
+      {
+        "type": "exercise_code",
+        "title": "<실습 3> 학습 시간 히스토그램",
+        "prompt": "1) 학습 시간(study_hours)을 **히스토그램**으로 나타내시오.\n2) 채점용 출력: `round(평균, 1)` 값을 `print()`로 출력하시오.\n\n⚠️ 채점을 위해 다른 print는 하지 마세요.",
+        "guide": "matplotlib으로 히스토그램을 그리고 st.pyplot(fig)로 출력하세요.",
+        "starter": "import streamlit as st\nimport pandas as pd\nfrom io import StringIO\nimport matplotlib.pyplot as plt\n\ncsv_text = \"\"\"student,grade,club,study_hours,sleep_hours,phone_hours,math_score,eng_score\nS01,1,AI,2.0,7.5,3.5,68,72\nS02,1,Music,1.5,6.8,4.2,62,75\nS03,1,Sports,3.0,7.0,2.8,74,69\nS04,1,AI,4.0,6.5,3.9,81,78\nS05,1,Art,2.5,7.8,3.0,70,80\nS06,2,AI,3.5,6.9,3.6,79,74\nS07,2,Music,2.0,7.2,3.2,71,77\nS08,2,Sports,4.5,6.4,4.5,85,70\nS09,2,AI,5.0,6.1,4.8,90,73\nS10,2,Art,1.0,8.0,2.1,60,82\nS11,2,AI,2.8,7.4,2.9,73,79\nS12,3,AI,4.2,6.0,5.1,88,71\nS13,3,Music,3.0,6.6,4.0,76,76\nS14,3,Sports,5.5,5.8,5.6,92,68\nS15,3,Art,2.2,7.9,2.5,69,84\nS16,3,AI,3.8,6.3,4.4,82,75\nS17,3,AI,1.7,7.6,3.3,64,81\nS18,1,AI,2.6,7.1,3.1,72,74\nS19,2,Sports,3.9,6.7,4.1,80,72\nS20,1,Music,2.1,7.3,3.0,67,78\n\"\"\"\n\ndf = pd.read_csv(StringIO(csv_text))\n\nfig, ax = plt.subplots()\nax.hist(df['study_hours'], bins=6)\nax.set_title('Study Hours Histogram')\nax.set_xlabel('study_hours')\nax.set_ylabel('count')\n\nst.pyplot(fig)\n\n# 채점용 출력: 평균을 소수 첫째자리까지\nprint(round(df['study_hours'].mean(), 1))\n",
+        "expected_output": "3.0",
+        "answer": "import streamlit as st\nimport pandas as pd\nfrom io import StringIO\nimport matplotlib.pyplot as plt\n\ncsv_text = \"\"\"student,grade,club,study_hours,sleep_hours,phone_hours,math_score,eng_score\nS01,1,AI,2.0,7.5,3.5,68,72\nS02,1,Music,1.5,6.8,4.2,62,75\nS03,1,Sports,3.0,7.0,2.8,74,69\nS04,1,AI,4.0,6.5,3.9,81,78\nS05,1,Art,2.5,7.8,3.0,70,80\nS06,2,AI,3.5,6.9,3.6,79,74\nS07,2,Music,2.0,7.2,3.2,71,77\nS08,2,Sports,4.5,6.4,4.5,85,70\nS09,2,AI,5.0,6.1,4.8,90,73\nS10,2,Art,1.0,8.0,2.1,60,82\nS11,2,AI,2.8,7.4,2.9,73,79\nS12,3,AI,4.2,6.0,5.1,88,71\nS13,3,Music,3.0,6.6,4.0,76,76\nS14,3,Sports,5.5,5.8,5.6,92,68\nS15,3,Art,2.2,7.9,2.5,69,84\nS16,3,AI,3.8,6.3,4.4,82,75\nS17,3,AI,1.7,7.6,3.3,64,81\nS18,1,AI,2.6,7.1,3.1,72,74\nS19,2,Sports,3.9,6.7,4.1,80,72\nS20,1,Music,2.1,7.3,3.0,67,78\n\"\"\"\n\ndf = pd.read_csv(StringIO(csv_text))\n\nfig, ax = plt.subplots()\nax.hist(df['study_hours'], bins=6)\nax.set_title('Study Hours Histogram')\nax.set_xlabel('study_hours')\nax.set_ylabel('count')\n\nst.pyplot(fig)\n\nprint(round(df['study_hours'].mean(), 1))"
+      }
+    ]
+  },
+  {
+    "sub_title": "05. 산점도",
+    "blocks": [
+      {
+        "type": "text",
+        "content": "## 산점도(scatter plot)\n- 학습 시간(study_hours)과 수학 점수(math_score)의 관계를 산점도로 확인합니다.\n- 채점: 두 변수의 상관계수를 **소수 셋째 자리까지 반올림**하여 print로 출력하세요."
+      },
+      {
+        "type": "exercise_code",
+        "title": "<실습 4> 학습 시간 vs 수학 점수 산점도",
+        "prompt": "1) 학습 시간(study_hours)과 수학 점수(math_score)를 **산점도**로 나타내시오.\n2) 채점용 출력: `round(상관계수, 3)` 값을 `print()`로 출력하시오.\n\n⚠️ 채점을 위해 다른 print는 하지 마세요.",
+        "guide": "matplotlib scatter + corr로 상관계수를 구해보세요.",
+        "starter": "import streamlit as st\nimport pandas as pd\nfrom io import StringIO\nimport matplotlib.pyplot as plt\n\ncsv_text = \"\"\"student,grade,club,study_hours,sleep_hours,phone_hours,math_score,eng_score\nS01,1,AI,2.0,7.5,3.5,68,72\nS02,1,Music,1.5,6.8,4.2,62,75\nS03,1,Sports,3.0,7.0,2.8,74,69\nS04,1,AI,4.0,6.5,3.9,81,78\nS05,1,Art,2.5,7.8,3.0,70,80\nS06,2,AI,3.5,6.9,3.6,79,74\nS07,2,Music,2.0,7.2,3.2,71,77\nS08,2,Sports,4.5,6.4,4.5,85,70\nS09,2,AI,5.0,6.1,4.8,90,73\nS10,2,Art,1.0,8.0,2.1,60,82\nS11,2,AI,2.8,7.4,2.9,73,79\nS12,3,AI,4.2,6.0,5.1,88,71\nS13,3,Music,3.0,6.6,4.0,76,76\nS14,3,Sports,5.5,5.8,5.6,92,68\nS15,3,Art,2.2,7.9,2.5,69,84\nS16,3,AI,3.8,6.3,4.4,82,75\nS17,3,AI,1.7,7.6,3.3,64,81\nS18,1,AI,2.6,7.1,3.1,72,74\nS19,2,Sports,3.9,6.7,4.1,80,72\nS20,1,Music,2.1,7.3,3.0,67,78\n\"\"\"\n\ndf = pd.read_csv(StringIO(csv_text))\n\nfig, ax = plt.subplots()\nax.scatter(df['study_hours'], df['math_score'])\nax.set_title('Study Hours vs Math Score')\nax.set_xlabel('study_hours')\nax.set_ylabel('math_score')\n\nst.pyplot(fig)\n\n# TODO: 상관계수를 구해 소수 셋째자리까지 반올림해서 출력하세요\ncorr_value = None\nprint(corr_value)\n",
+        "expected_output": "0.985",
+        "answer": "import streamlit as st\nimport pandas as pd\nfrom io import StringIO\nimport matplotlib.pyplot as plt\n\ncsv_text = \"\"\"student,grade,club,study_hours,sleep_hours,phone_hours,math_score,eng_score\nS01,1,AI,2.0,7.5,3.5,68,72\nS02,1,Music,1.5,6.8,4.2,62,75\nS03,1,Sports,3.0,7.0,2.8,74,69\nS04,1,AI,4.0,6.5,3.9,81,78\nS05,1,Art,2.5,7.8,3.0,70,80\nS06,2,AI,3.5,6.9,3.6,79,74\nS07,2,Music,2.0,7.2,3.2,71,77\nS08,2,Sports,4.5,6.4,4.5,85,70\nS09,2,AI,5.0,6.1,4.8,90,73\nS10,2,Art,1.0,8.0,2.1,60,82\nS11,2,AI,2.8,7.4,2.9,73,79\nS12,3,AI,4.2,6.0,5.1,88,71\nS13,3,Music,3.0,6.6,4.0,76,76\nS14,3,Sports,5.5,5.8,5.6,92,68\nS15,3,Art,2.2,7.9,2.5,69,84\nS16,3,AI,3.8,6.3,4.4,82,75\nS17,3,AI,1.7,7.6,3.3,64,81\nS18,1,AI,2.6,7.1,3.1,72,74\nS19,2,Sports,3.9,6.7,4.1,80,72\nS20,1,Music,2.1,7.3,3.0,67,78\n\"\"\"\n\ndf = pd.read_csv(StringIO(csv_text))\n\nfig, ax = plt.subplots()\nax.scatter(df['study_hours'], df['math_score'])\nax.set_title('Study Hours vs Math Score')\nax.set_xlabel('study_hours')\nax.set_ylabel('math_score')\n\nst.pyplot(fig)\n\ncorr_value = round(df['study_hours'].corr(df['math_score']), 3)\nprint(corr_value)"
+      }
+    ]
+  },
+  {
+    "sub_title": "06. 박스플롯",
+    "blocks": [
+      {
+        "type": "text",
+        "content": "## 박스플롯(box plot)\n- 학년별 수학 점수 분포를 박스플롯으로 확인합니다.\n- 채점: **2학년 수학 점수의 중앙값(median)** 을 print로 출력하세요."
+      },
+      {
+        "type": "exercise_code",
+        "title": "<실습 5> 학년별 수학 점수 박스플롯",
+        "prompt": "1) 학년별 수학 점수(math_score)를 **박스플롯**으로 나타내시오.\n2) 채점용 출력: 2학년 수학 점수의 중앙값을 `print()`로 출력하시오.\n\n⚠️ 채점을 위해 다른 print는 하지 마세요.",
+        "guide": "pandas boxplot(by=...) 또는 matplotlib로 박스플롯을 만들어보세요.",
+        "starter": "import streamlit as st\nimport pandas as pd\nfrom io import StringIO\nimport matplotlib.pyplot as plt\n\ncsv_text = \"\"\"student,grade,club,study_hours,sleep_hours,phone_hours,math_score,eng_score\nS01,1,AI,2.0,7.5,3.5,68,72\nS02,1,Music,1.5,6.8,4.2,62,75\nS03,1,Sports,3.0,7.0,2.8,74,69\nS04,1,AI,4.0,6.5,3.9,81,78\nS05,1,Art,2.5,7.8,3.0,70,80\nS06,2,AI,3.5,6.9,3.6,79,74\nS07,2,Music,2.0,7.2,3.2,71,77\nS08,2,Sports,4.5,6.4,4.5,85,70\nS09,2,AI,5.0,6.1,4.8,90,73\nS10,2,Art,1.0,8.0,2.1,60,82\nS11,2,AI,2.8,7.4,2.9,73,79\nS12,3,AI,4.2,6.0,5.1,88,71\nS13,3,Music,3.0,6.6,4.0,76,76\nS14,3,Sports,5.5,5.8,5.6,92,68\nS15,3,Art,2.2,7.9,2.5,69,84\nS16,3,AI,3.8,6.3,4.4,82,75\nS17,3,AI,1.7,7.6,3.3,64,81\nS18,1,AI,2.6,7.1,3.1,72,74\nS19,2,Sports,3.9,6.7,4.1,80,72\nS20,1,Music,2.1,7.3,3.0,67,78\n\"\"\"\n\ndf = pd.read_csv(StringIO(csv_text))\n\nfig, ax = plt.subplots()\ndf.boxplot(column='math_score', by='grade', ax=ax)\nax.set_title('Math Score by Grade')\nax.set_xlabel('grade')\nax.set_ylabel('math_score')\n\nst.pyplot(fig)\n\n# TODO: 2학년 수학 점수 중앙값을 출력하세요 (정수로 출력)\nme_
