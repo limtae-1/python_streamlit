@@ -123,7 +123,8 @@ def run_user_code(user_code: str, stdin_text: str = ""):
 
     builtins.input = fake_input
     try:
-        exec(user_code, {})
+        _exec_globals = {'_turtle_canvas_size': st.session_state.get('turtle_canvas_size', 4)}
+        exec(user_code, _exec_globals)
         return {"ok": True, "output": redirected_output.getvalue(), "error": None}
     except Exception as e:
         return {"ok": False, "output": redirected_output.getvalue(), "error": str(e)}
