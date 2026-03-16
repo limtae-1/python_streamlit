@@ -1,0 +1,256 @@
+[
+  {
+    "sub_title": "01. 터틀 소개 및 기본 이동",
+    "blocks": [
+      {
+        "type": "text",
+        "lines": [
+          "## 터틀(Turtle) 그래픽이란?",
+          "- **터틀(Turtle) 그래픽**은 화면 위의 거북이가 명령에 따라 움직이며 그림을 그리는 프로그래밍 방법입니다.",
+          "- 이 실습에서는 **matplotlib** 라이브러리를 사용해 터틀 개념을 배웁니다.",
+          "",
+          "## 기본 개념",
+          "- 거북이는 현재 **위치(x, y)** 와 **방향(각도)** 을 가지고 있습니다.",
+          "- 명령어로 앞/뒤로 이동하거나 방향을 바꿀 수 있습니다.",
+          "",
+          "| 명령어 | 설명 |",
+          "|--------|------|",
+          "| `forward(n)` | n만큼 앞으로 이동 |",
+          "| `backward(n)` | n만큼 뒤로 이동 |",
+          "| `left(angle)` | 왼쪽으로 angle도 회전 |",
+          "| `right(angle)` | 오른쪽으로 angle도 회전 |"
+        ]
+      },
+      {
+        "type": "text",
+        "content": "### <예시 1> 직선 그리기\n아래 코드는 거북이가 앞으로 100 이동하는 예시입니다."
+      },
+      {
+        "type": "code",
+        "guide": "코드를 실행해보세요. 거북이가 직선을 그립니다.",
+        "content": "import matplotlib.pyplot as plt\nimport math\n\n# --- 터틀 엔진 (수정하지 마세요) ---\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0  # 위쪽이 기본 방향\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen:\n            self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen:\n            self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=12)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig)\n        plt.close()\n\nt = Turtle()\n\n# ===== 여기서부터 터틀 명령어 =====\nt.forward(100)   # 앞으로 100 이동\n\n# ===================================\nt.show()"
+      },
+      {
+        "type": "text",
+        "content": "### <예시 2> 앞뒤/좌우 이동\n`backward()`와 `left()`, `right()`를 함께 사용해봅시다."
+      },
+      {
+        "type": "code",
+        "guide": "거북이가 앞으로 갔다가 방향을 바꿔 다시 이동합니다. 코드를 실행해보세요.",
+        "content": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=12)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\n\n# ===== 터틀 명령어 =====\nt.forward(80)    # 앞으로 80\nt.right(90)      # 오른쪽으로 90도 회전\nt.forward(60)    # 앞으로 60\nt.left(45)       # 왼쪽으로 45도 회전\nt.backward(50)   # 뒤로 50\n# =======================\nt.show()"
+      },
+      {
+        "type": "exercise_code",
+        "title": "<연습해보기> 계단 모양 그리기",
+        "prompt": "거북이로 **계단 모양**을 그려보세요.\n\n조건:\n- 앞으로 50 → 오른쪽 90도 → 앞으로 50 → 왼쪽 90도 순서로 **3번** 반복\n- 마지막에 `print('계단 완성')`을 출력하세요.",
+        "guide": "starter 코드를 완성하고 실행해보세요.",
+        "starter": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=12)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\n\n# ===== 여기에 계단 코드 작성 =====\n# (앞으로 50 → 오른쪽 90 → 앞으로 50 → 왼쪽 90)을 3번 반복하세요\n\n\n# =================================\nt.show()\nprint()  # '계단 완성' 출력",
+        "expected_output": "계단 완성",
+        "answer": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=12)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\n\nfor _ in range(3):\n    t.forward(50)\n    t.right(90)\n    t.forward(50)\n    t.left(90)\n\nt.show()\nprint('계단 완성')"
+      }
+    ]
+  },
+
+  {
+    "sub_title": "02. 펜 설정과 색상",
+    "blocks": [
+      {
+        "type": "text",
+        "lines": [
+          "## 펜(Pen) 설정하기",
+          "- 터틀의 펜을 **들거나(penup)** / **내려놓으면(pendown)** 선이 그려지지 않거나 그려집니다.",
+          "- 펜의 **색상(color)** 을 바꾸면 다른 색으로 그릴 수 있습니다.",
+          "",
+          "| 명령어 | 설명 |",
+          "|--------|------|",
+          "| `penup()` | 펜을 들어 이동해도 선이 그려지지 않음 |",
+          "| `pendown()` | 펜을 내려 이동하면 선이 그려짐 |",
+          "| `setcolor('색이름')` | 선 색상 변경 (red, blue, green 등) |"
+        ]
+      },
+      {
+        "type": "text",
+        "content": "### <예시 1> penup / pendown 활용\n펜을 들고 이동한 뒤, 다시 내려놓으면 새로운 위치에서 그리기를 시작합니다."
+      },
+      {
+        "type": "code",
+        "guide": "두 개의 분리된 선을 그리는 코드입니다. 실행해보세요.",
+        "content": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=12)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\n\n# 첫 번째 선\nt.forward(80)\n\n# 펜 들고 이동 (선 안 그려짐)\nt.penup()\nt.right(90)\nt.forward(60)\nt.pendown()\n\n# 두 번째 선 (새 위치에서 시작)\nt.forward(80)\n\nt.show()"
+      },
+      {
+        "type": "text",
+        "content": "### <예시 2> 색상 변경\n`setcolor('색이름')`으로 선 색상을 바꿀 수 있습니다."
+      },
+      {
+        "type": "code",
+        "guide": "빨강, 파랑, 초록 세 가지 색으로 선을 그립니다. 실행해보세요.",
+        "content": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 0.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=3)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=12)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\n\n# 색상별 선 그리기\ncolors = ['red', 'blue', 'green']\nfor c in colors:\n    t.setcolor(c)    # 색 변경\n    t.forward(80)\n    t.penup()\n    t.left(90)\n    t.forward(30)\n    t.right(90)\n    t.pendown()\n\nt.show()"
+      },
+      {
+        "type": "exercise_code",
+        "title": "<연습해보기> 신호등 그리기",
+        "prompt": "거북이로 **신호등처럼 3가지 색 선**을 그려보세요.\n\n조건:\n- **빨강(red)** 선 → 오른쪽 90도 → 이동 없이 색 바꿈 → **노랑(yellow)** 선 → 오른쪽 90도 → **초록(green)** 선\n- 각 선의 길이는 **60**\n- 마지막에 `print('신호등 완성')`을 출력하세요.",
+        "guide": "setcolor()와 penup/pendown을 활용해보세요.",
+        "starter": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=5)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=12)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\n\n# ===== 여기에 신호등 코드 작성 =====\n\n\n\n# ==================================\nt.show()\nprint()  # '신호등 완성' 출력",
+        "expected_output": "신호등 완성",
+        "answer": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=5)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=12)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\n\nt.setcolor('red')\nt.forward(60)\nt.right(90)\nt.setcolor('yellow')\nt.forward(60)\nt.right(90)\nt.setcolor('green')\nt.forward(60)\n\nt.show()\nprint('신호등 완성')"
+      }
+    ]
+  },
+
+  {
+    "sub_title": "03. 기본 도형 그리기",
+    "blocks": [
+      {
+        "type": "text",
+        "lines": [
+          "## 도형 그리기",
+          "- 터틀로 **삼각형, 사각형, 오각형** 같은 정다각형을 그릴 수 있습니다.",
+          "- 정다각형의 규칙: **한 변의 길이**와 **외각(360 ÷ 변의 수)** 을 이용합니다.",
+          "",
+          "| 도형 | 변의 수 | 회전 각도 |",
+          "|------|---------|----------|",
+          "| 정삼각형 | 3 | 360 ÷ 3 = **120도** |",
+          "| 정사각형 | 4 | 360 ÷ 4 = **90도** |",
+          "| 정오각형 | 5 | 360 ÷ 5 = **72도** |",
+          "| 정육각형 | 6 | 360 ÷ 6 = **60도** |"
+        ]
+      },
+      {
+        "type": "text",
+        "content": "### <예시 1> 정삼각형 그리기\n앞으로 100 이동 → 오른쪽 120도 회전을 **3번** 반복합니다."
+      },
+      {
+        "type": "code",
+        "guide": "정삼각형을 그리는 코드입니다. 실행해보세요.",
+        "content": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=12)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\nt.setcolor('red')\n\n# 정삼각형: 3번 반복 (앞으로 → 오른쪽 120도)\nfor _ in range(3):\n    t.forward(100)\n    t.right(120)\n\nt.show()"
+      },
+      {
+        "type": "text",
+        "content": "### <예시 2> 정사각형 그리기"
+      },
+      {
+        "type": "code",
+        "guide": "정사각형을 그립니다. 각도를 바꿔 다른 도형도 만들어보세요.",
+        "content": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=12)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\nt.setcolor('blue')\n\n# 정사각형: 4번 반복 (앞으로 → 오른쪽 90도)\nfor _ in range(4):\n    t.forward(100)\n    t.right(90)\n\nt.show()"
+      },
+      {
+        "type": "exercise_code",
+        "title": "<연습해보기> 정육각형 그리기",
+        "prompt": "거북이로 **정육각형**을 그려보세요.\n\n조건:\n- 변의 길이: **80**\n- 색상: **purple**\n- 정육각형의 외각 = 360 ÷ 6 = **60도**\n- 마지막에 `print('정육각형 완성')`을 출력하세요.",
+        "guide": "for문을 사용해 6번 반복하세요.",
+        "starter": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=12)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\n\n# ===== 여기에 정육각형 코드 작성 =====\n\n\n\n# =====================================\nt.show()\nprint()  # '정육각형 완성' 출력",
+        "expected_output": "정육각형 완성",
+        "answer": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=12)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\nt.setcolor('purple')\n\nfor _ in range(6):\n    t.forward(80)\n    t.right(60)\n\nt.show()\nprint('정육각형 완성')"
+      }
+    ]
+  },
+
+  {
+    "sub_title": "04. 반복문으로 패턴 만들기",
+    "blocks": [
+      {
+        "type": "text",
+        "lines": [
+          "## 반복문 + 터틀 = 멋진 패턴!",
+          "- `for`문과 터틀을 결합하면 복잡해 보이는 패턴도 쉽게 그릴 수 있습니다.",
+          "- **반복할 때마다 조금씩 변화**를 주면 나선, 별, 꽃 모양이 만들어집니다.",
+          "",
+          "### 핵심 아이디어",
+          "- 반복할 때마다 **이동 거리를 늘리면** → 나선 모양",
+          "- 반복할 때마다 **색상을 바꾸면** → 무지개 패턴",
+          "- 도형을 **조금씩 회전시키며 여러 번 그리면** → 꽃, 만다라 모양"
+        ]
+      },
+      {
+        "type": "text",
+        "content": "### <예시 1> 나선형 그리기\n이동 거리를 반복마다 늘리면 나선 모양이 됩니다."
+      },
+      {
+        "type": "code",
+        "guide": "나선형 패턴입니다. 실행해보세요.",
+        "content": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=1.5)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=10)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\nt.setcolor('steelblue')\n\n# 나선형: 반복할 때마다 거리가 2씩 늘어남\ndistance = 5\nfor _ in range(50):\n    t.forward(distance)\n    t.right(89)       # 89도 회전 → 나선\n    distance += 2     # 거리 증가\n\nt.show()"
+      },
+      {
+        "type": "text",
+        "content": "### <예시 2> 무지개 사각형 패턴\n반복할 때마다 색상을 바꾸고, 조금씩 회전합니다."
+      },
+      {
+        "type": "code",
+        "guide": "무지개 색상으로 사각형을 반복해 그립니다. 실행해보세요.",
+        "content": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=1.5)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=10)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\n\ncolors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']\n\n# 색마다 사각형을 10도씩 돌려가며 그리기\nfor i, c in enumerate(colors):\n    t.setcolor(c)\n    for _ in range(4):\n        t.forward(100)\n        t.right(90)\n    t.right(10)   # 10도 회전 후 다음 사각형\n\nt.show()"
+      },
+      {
+        "type": "text",
+        "content": "### <예시 3> 별 모양 그리기\n5번 반복, 144도 회전으로 별을 그릴 수 있습니다."
+      },
+      {
+        "type": "code",
+        "guide": "별 모양 그리기입니다. 실행해보세요.",
+        "content": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=10)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\nt.setcolor('gold')\n\n# 별: 5번 반복, 144도 회전\nfor _ in range(5):\n    t.forward(150)\n    t.right(144)\n\nt.show()"
+      },
+      {
+        "type": "exercise_code",
+        "title": "<연습해보기> 꽃 패턴 만들기",
+        "prompt": "삼각형을 **12번** 반복 그리되, 매번 **30도씩 회전**해서 꽃 모양을 만드세요.\n\n조건:\n- 삼각형 한 변의 길이: **80**\n- 색상은 자유\n- 마지막에 `print(12)`를 출력하세요. (몇 번 그렸는지)",
+        "guide": "이중 for문을 사용하세요: 바깥 for는 12번, 안쪽 for는 삼각형(3번).",
+        "starter": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=1.5)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=10)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\nt.setcolor('hotpink')\n\ncount = 0\n# ===== 여기에 꽃 패턴 코드 작성 =====\n# 바깥 for: 12번 반복, 매번 삼각형을 그리고 30도 회전\n\n\n\n# =====================================\nt.show()\nprint(count)  # 몇 번 그렸는지 출력",
+        "expected_output": "12",
+        "answer": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=1.5)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=10)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\nt.setcolor('hotpink')\n\ncount = 0\nfor i in range(12):\n    for _ in range(3):\n        t.forward(80)\n        t.right(120)\n    t.right(30)\n    count += 1\n\nt.show()\nprint(count)"
+      }
+    ]
+  },
+
+  {
+    "sub_title": "05. 나만의 작품 만들기",
+    "blocks": [
+      {
+        "type": "text",
+        "lines": [
+          "## 나만의 터틀 작품 만들기",
+          "지금까지 배운 모든 기능을 자유롭게 활용해 나만의 그림을 그려보세요.",
+          "",
+          "### 지금까지 배운 명령어 정리",
+          "",
+          "| 명령어 | 설명 |",
+          "|--------|------|",
+          "| `t.forward(n)` | 앞으로 n 이동 |",
+          "| `t.backward(n)` | 뒤로 n 이동 |",
+          "| `t.left(angle)` | 왼쪽으로 angle도 회전 |",
+          "| `t.right(angle)` | 오른쪽으로 angle도 회전 |",
+          "| `t.penup()` | 펜 들기 (선 안 그려짐) |",
+          "| `t.pendown()` | 펜 내리기 (선 그려짐) |",
+          "| `t.setcolor('색이름')` | 선 색상 변경 |",
+          "| `t.goto(x, y)` | 특정 좌표로 이동 |",
+          "",
+          "### 사용 가능한 색상 예시",
+          "`red`, `orange`, `yellow`, `green`, `blue`, `purple`, `pink`, `gold`, `cyan`, `hotpink`, `steelblue`, `tomato`"
+        ]
+      },
+      {
+        "type": "text",
+        "content": "### <예시> 집 그리기\n사각형(몸체) + 삼각형(지붕)으로 집을 그립니다."
+      },
+      {
+        "type": "code",
+        "guide": "집을 그리는 예시 코드입니다. 코드를 분석하고 실행해보세요.",
+        "content": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=10)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\n\n# --- 집 몸체 (사각형) ---\nt.setcolor('brown')\nfor _ in range(4):\n    t.forward(100)\n    t.right(90)\n\n# --- 지붕 (삼각형) ---\nt.setcolor('red')\nt.forward(100)      # 오른쪽 벽 위쪽으로\nt.left(120)         # 지붕 방향으로\nt.forward(100)\nt.left(120)\nt.forward(100)\n\n# --- 문 ---\nt.penup()\nt.goto(35, 0)\nt.pendown()\nt.setcolor('blue')\nt.left(90)\nfor _ in range(3):\n    t.forward(40)\n    t.right(90)\nt.forward(40)\n\nt.show()"
+      },
+      {
+        "type": "code",
+        "guide": "아래 코드를 자유롭게 수정해서 나만의 작품을 만들어보세요!",
+        "content": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=10)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\n\n# ===== 여기에 나만의 작품을 그려보세요! =====\n# 힌트: 여러 도형을 조합하거나, 반복문과 색상을 활용해보세요.\n\ncolors = ['red', 'orange', 'gold', 'green', 'blue', 'purple']\nfor i, c in enumerate(colors):\n    t.setcolor(c)\n    for _ in range(5):        # 별 모양\n        t.forward(80)\n        t.right(144)\n    t.penup()\n    t.goto(0, 0)              # 원점으로 복귀\n    t.pendown()\n    t.right(360 / len(colors))  # 조금씩 회전\n\n# ==========================================\nt.show()"
+      },
+      {
+        "type": "exercise_code_input",
+        "title": "<최종 도전> 내가 원하는 도형 그리기",
+        "prompt": "입력값을 받아 **원하는 정다각형**을 그리는 프로그램을 만드세요.\n\n조건:\n- `input()`으로 **변의 수(n)** 를 입력받으세요.\n- 한 변의 길이는 **80**, 회전 각도는 `360 / n`\n- 마지막에 `print(f'{n}각형 완성')`을 출력하세요.\n\n예) 입력: `6` → 출력: `6각형 완성`",
+        "guide": "int(input())으로 정수를 입력받아 for문에 활용하세요.",
+        "starter": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=10)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\nt.setcolor('steelblue')\n\n# ===== 여기에 코드 작성 =====\nn = int(input('변의 수를 입력하세요: '))\n\n# n각형 그리기\n\n\n# ===========================\nt.show()\nprint()  # f'{n}각형 완성' 출력",
+        "stdin": "6",
+        "expected_output": "6각형 완성",
+        "answer": "import matplotlib.pyplot as plt\nimport math\n\nclass Turtle:\n    def __init__(self):\n        self.x, self.y = 0.0, 0.0\n        self.angle = 90.0\n        self.pen = True\n        self.lines = []\n        self.color = 'black'\n    def forward(self, d):\n        nx = self.x + d * math.cos(math.radians(self.angle))\n        ny = self.y + d * math.sin(math.radians(self.angle))\n        if self.pen: self.lines.append((self.x, self.y, nx, ny, self.color))\n        self.x, self.y = nx, ny\n    def backward(self, d): self.forward(-d)\n    def left(self, a): self.angle += a\n    def right(self, a): self.angle -= a\n    def penup(self): self.pen = False\n    def pendown(self): self.pen = True\n    def setcolor(self, c): self.color = c\n    def goto(self, x, y):\n        if self.pen: self.lines.append((self.x, self.y, x, y, self.color))\n        self.x, self.y = x, y\n    def show(self):\n        fig, ax = plt.subplots(figsize=(5, 5))\n        for x1, y1, x2, y2, c in self.lines:\n            ax.plot([x1, x2], [y1, y2], color=c, linewidth=2)\n        ax.plot(self.x, self.y, marker='>', color='green', markersize=10)\n        ax.set_xlim(-200, 200); ax.set_ylim(-200, 200)\n        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)\n        ax.axhline(0, color='gray', linewidth=0.5)\n        ax.axvline(0, color='gray', linewidth=0.5)\n        import streamlit as st\n        st.pyplot(fig); plt.close()\n\nt = Turtle()\nt.setcolor('steelblue')\n\nn = int(input('변의 수를 입력하세요: '))\n\nfor _ in range(n):\n    t.forward(80)\n    t.right(360 / n)\n\nt.show()\nprint(f'{n}각형 완성')"
+      }
+    ]
+  }
+]
