@@ -240,6 +240,12 @@ else:
     menu_options = {item['title']: item for item in menu_data}
     selected_main_title = st.sidebar.selectbox("대단원 선택", list(menu_options.keys()))
 
+    if '터틀' in (selected_main_title or ''):
+        st.sidebar.divider()
+        st.sidebar.slider('🐢 캔버스 크기', min_value=2, max_value=8, value=4, step=1,
+                          help='실행 버튼을 다시 눌러야 적용됩니다.',
+                          key='turtle_canvas_size')
+
     if selected_main_title:
         selected_file = menu_options[selected_main_title]['file']
         chapter_data = load_json(os.path.join("data", selected_file))
