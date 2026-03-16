@@ -1,5 +1,6 @@
 [
     {"id": "01_python", "title": "1. 파이썬 기초", "file": "01_python.json"},
     {"id": "02_data", "title": "2. 데이터 분석", "file": "02_data.json"},
-    {"id": "03_ai", "title": "3. 인공지능", "file": "03_ai.json"}
+    {"id": "03_ai", "title": "3. 인공지능", "file": "03_ai.json"},
+    {"id": "04_turtle", "title": "4. 터틀 그래픽", "file": "04_turtle.json"}
 ]
